@@ -1,4 +1,4 @@
-PORT=ttyACM1
+PORT=ttyACM0
 
 CROSS=arm-none-eabi-
 BOSSAC=bossac
@@ -19,5 +19,6 @@ clean:
 	rm *.bin *.elf *.nm *.asm *.hexdump 2> /dev/null
 
 flash:
-	${BOSSAC} -i -d --port=${PORT} -i -e -w -v kernel.bin -R --offset 0x2000
+	echo "disabled flashing"
+#	${BOSSAC} -i -d --port=${PORT} -i -e -w -v kernel.bin -R --offset 0x2000
 
