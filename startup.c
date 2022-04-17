@@ -18,9 +18,13 @@
 */
 
 #include "sam.h"
-#include "variant.h"
+//#include "variant.h"
+//next two defines instead of variant
+//#define VARIANT_MAINOSC		(32768ul)
+//#define VARIANT_MCK	(F_CPU)
+#include "variant-cutdown.h"
 
-#include <stdio.h>
+//#include <stdio.h>
 
 // Constants for Clock generators
 #define GENERIC_CLOCK_GENERATOR_MAIN      (0u)

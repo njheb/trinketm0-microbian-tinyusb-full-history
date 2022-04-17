@@ -18,7 +18,7 @@ volatile unsigned int* gpio;
 volatile unsigned int tim;
 
 /** Main function - we'll never return from here */
-void kernel_main() {
+void main() {
 	/* Set output direction for LED pin*/
 	gpio = (unsigned int*)PORTDIRSET;
 	*gpio |= (1 << LED_GPIO_BIT);

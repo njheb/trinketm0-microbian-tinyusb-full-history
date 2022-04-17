@@ -17,7 +17,7 @@
 */
 
 #include "delay.h"
-#include "Arduino.h"
+//#include "Arduino.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -21,7 +21,9 @@
 #define _DELAY_
 
 #include <stdint.h>
-#include "variant.h"
+//#include "variant.h"
+#include "variant-cutdown.h"
+#include "sam.h"
 
 #ifdef __cplusplus
 extern "C" {

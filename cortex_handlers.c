@@ -18,8 +18,9 @@
 */
 
 #include <sam.h>
-#include <variant.h>
-#include <stdio.h>
+#include <stddef.h> //for NULL
+//#include <variant.h>
+//#include <stdio.h>
 
 /* RTOS Hooks */
 extern void svcHook(void);
