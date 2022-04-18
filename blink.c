@@ -22,7 +22,7 @@ volatile unsigned int* gpio;
 volatile unsigned int tim;
 
 extern void force_bootloader(void);
-int count = 1000;
+int count = 100;
 //see WVariant.h EPortType port = PORTA;
 /** Main function - we'll never return from here */
 void main() {
@@ -75,7 +75,7 @@ uint32_t pinMask = (1ul << pin);
 #else
                 PORT->Group[port].OUTCLR.reg = pinMask;
 #endif
-
+ 
 #if 1
 		for (tim = 0; tim < 1000; tim++)
                 {
@@ -92,5 +92,6 @@ uint32_t pinMask = (1ul << pin);
 #else
                 PORT->Group[port].OUTSET.reg = pinMask;
 #endif
+//        delay(1);//see if we are getting stuck in delay seems to get stuck in delay
 	}
 }
