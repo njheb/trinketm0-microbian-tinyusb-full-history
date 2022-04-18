@@ -22,7 +22,7 @@ volatile unsigned int* gpio;
 volatile unsigned int tim;
 
 extern void force_bootloader(void);
-int count = 100;
+int count = 1000;
 //see WVariant.h EPortType port = PORTA;
 /** Main function - we'll never return from here */
 void main() {
@@ -40,10 +40,13 @@ uint32_t pinMask = (1ul << pin);
       // Set pin to output mode
       PORT->Group[port].DIRSET.reg = pinMask;
 #endif
-
+#if defined(USE_TINYUSB)
+  TinyUSB_Device_Init(0);
+#endif
 
 	/* Never exit */
 	while (1) {
+
         count--;
 
   if (count <= 1) //10ms * 10000 = 100secs ish, check this works before adding to microbian port for first test recovery
@@ -51,9 +54,20 @@ uint32_t pinMask = (1ul << pin);
      force_bootloader();
   }
 
-		for (tim = 0; tim < 500000; tim++)
-			;
+//   yield(); // yield run usb background task
 
+  // if (serialEventRun) serialEventRun(); for hardwareserial
+
+  
+#if 1
+		for (tim = 0; tim < 1000; tim++)
+                {
+			for (int i =0; i < 1000; i++ ){;}
+                        yield();
+                }
+#else
+                delay(500);
+#endif
 		/* Clear LED output pin*/
 #ifdef IMPROPER
 		gpio = (unsigned int*)PORTCLR;
@@ -62,9 +76,15 @@ uint32_t pinMask = (1ul << pin);
                 PORT->Group[port].OUTCLR.reg = pinMask;
 #endif
 
-		for (tim = 0; tim < 500000; tim++)
-			;
-
+#if 1
+		for (tim = 0; tim < 1000; tim++)
+                {
+			for (int i =0; i < 1000; i++ ){;}
+                        yield();
+                }
+#else
+                delay(500);
+#endif
 		/* Set LED output pin*/
 #ifdef IMPROPER
 		gpio = (unsigned int*)PORTOUT;
