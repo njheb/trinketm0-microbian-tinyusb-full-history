@@ -83,10 +83,7 @@ SORRY = echo "Please say 'make $@.hex' to compile '$@'"
 
 
 clean:
-	rm *.bin *.elf *.nm *.asm *.hexdump #2> /dev/null
-
-ultraclean:
-	rm -f *.hex *.elf *.bin *.map *.o
+	rm -f *.bin *.elf *.nm *.map *.o *elf.asm *.hexdump #2> /dev/null
 
 
 flash: kernel.bin
@@ -97,5 +94,5 @@ flash: kernel.bin
 
 ###
 
-battery.o adc-VDD-only.o: microbian.h lib.h hardware.h
+#battery.o adc-VDD-only.o: microbian.h lib.h hardware.h
 
