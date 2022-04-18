@@ -1,7 +1,7 @@
 all: kernel.bin
 
 PORT=ttyACM0
-BOSSAC=bossac
+BOSSAC=/home/nick/.arduino15/packages/adafruit/tools/bossac/1.8.0-48-gb176eee/bossac
 
 CC = arm-none-eabi-gcc
 CPU = -mcpu=cortex-m0plus -mthumb #microbian uses cortex-m0 not plus
@@ -51,7 +51,7 @@ vpath %.h ./microbian
 #                $^ -nostdlib -lgcc -lc -o $@ -Wl,-Map,$*.map
 #        $(SIZE) $@
 
-%.elf: cortex_handlers.o startup.o temp-wiring.o hooks.o delay.o Reset.o blink.o
+%.elf: cortex_handlers.o startup.o temp-wiring.o hooks.o delay.o Reset.o blink.o force_bootloader.o
 	$(CC) $(CPU) $(CFLAGS) -T ./variant-trinketm0/flash_with_bootloader.ld \
 		$^ -nostdlib -lgcc -lc -o $@ -Wl,-Map,$*.map
 	$(SIZE) $@
@@ -89,9 +89,8 @@ ultraclean:
 	rm -f *.hex *.elf *.bin *.map *.o
 
 
-flash:
-	echo "disabled flashing"
-#	${BOSSAC} -i -d --port=${PORT} -i -e -w -v kernel.bin -R --offset 0x2000
+flash: kernel.bin
+	${BOSSAC} -i -d --port=${PORT} -i -e -w -v kernel.bin -R --offset 0x2000
 
 # Don't delete intermediate files
 .SECONDARY:

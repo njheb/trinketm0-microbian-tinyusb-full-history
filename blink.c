@@ -17,6 +17,9 @@ volatile unsigned int* gpio;
 /** Simple loop variable */
 volatile unsigned int tim;
 
+extern void force_bootloader(void);
+int count = 10000;
+
 /** Main function - we'll never return from here */
 void main() {
 	/* Set output direction for LED pin*/
@@ -25,6 +28,13 @@ void main() {
 
 	/* Never exit */
 	while (1) {
+        count--;
+
+  if (count <= 1) //10ms * 10000 = 100secs ish, check this works before adding to microbian port for first test recovery
+  {
+     force_bootloader();  
+  }
+
 		for (tim = 0; tim < 5000; tim++)
 			;
 
