@@ -29,7 +29,7 @@ void main() {
 uint32_t port = 0;
 uint32_t pin = 10;
 uint32_t pinMask = (1ul << pin);
-
+        init();
 	/* Set output direction for LED pin*/
 #ifdef IMPROPER
 	gpio = (unsigned int*)PORTDIRSET;
@@ -59,7 +59,7 @@ uint32_t pinMask = (1ul << pin);
   // if (serialEventRun) serialEventRun(); for hardwareserial
 
   
-#if 1
+#if 0
 		for (tim = 0; tim < 1000; tim++)
                 {
 			for (int i =0; i < 1000; i++ ){;}
@@ -76,7 +76,7 @@ uint32_t pinMask = (1ul << pin);
                 PORT->Group[port].OUTCLR.reg = pinMask;
 #endif
  
-#if 1
+#if 0
 		for (tim = 0; tim < 1000; tim++)
                 {
 			for (int i =0; i < 1000; i++ ){;}
