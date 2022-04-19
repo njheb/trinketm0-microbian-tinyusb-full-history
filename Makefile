@@ -16,7 +16,7 @@ CPU = -mcpu=cortex-m0plus -mthumb #microbian uses cortex-m0 not plus
 #remove -DUSE_TINYUSB for now
 CFLAGS= -Wall -g -nostartfiles -O -DF_CPU=48000000UL -ffreestanding \
 -D__SAMD21E18A__ -DCRYSTALLESS -DADAFRUIT_TRINKET_M0 -DARDUINO_SAMD_ZERO -DARM_MATH_CM0PLUS -DUSB_VID=0x239A -DUSB_PID=0x801e \
--DUSBCON -DUSB_CONFIG_POWER=100 "-DUSB_MANUFACTURER=\"Adafruit\"" "-DUSB_PRODUCT=\"Trinket M0\"" -DUSE_TINYUSB
+-DUSBCON -DUSB_CONFIG_POWER=100 "-DUSB_MANUFACTURER=\"Adafruit\"" "-DUSB_PRODUCT=\"Trinket M0\""
 
 #LFLAGS=-Wl,-T,trinketm0.ld
 
@@ -51,7 +51,7 @@ vpath %.h ./microbian
 #                $^ -nostdlib -lgcc -lc -o $@ -Wl,-Map,$*.map
 #        $(SIZE) $@
 
-%.elf: cortex_handlers.o startup.o temp-wiring.o hooks.o delay.o Reset.o blink.o force_bootloader.o adafruit-tinyusb-cdc.a
+%.elf: cortex_handlers.o startup.o temp-wiring.o hooks.o delay.o Reset.o blink.o force_bootloader.o
 	$(CC) $(CPU) $(CFLAGS) -T ./variant-trinketm0/flash_with_bootloader.ld \
 		$^ -nostdlib -lgcc -lc -o $@ -Wl,-Map,$*.map
 	$(SIZE) $@
