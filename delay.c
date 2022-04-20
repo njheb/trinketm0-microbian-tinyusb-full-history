@@ -99,7 +99,7 @@ void delay( unsigned long ms )
 
   while (ms > 0)
   {
-    yield();
+//    yield();
     while (ms > 0 && (micros() - start) >= 1000)
     {
       ms--;
@@ -108,23 +108,23 @@ void delay( unsigned long ms )
   }
 }
 
-#include "Reset.h" // for tickReset()
+//#include "Reset.h" // for tickReset()
 
 void SysTick_DefaultHandler(void)
 {
   // Increment tick count each ms
   _ulTickCount++;
-  tickReset();
+//  tickReset();
 }
 
 #if defined(USE_TINYUSB)
 
 // run TinyUSB background task when yield()
-void yield(void)
-{
-  TinyUSB_Device_Task();
-  TinyUSB_Device_FlushCDC();
-}
+//void yield(void)
+//{
+//  TinyUSB_Device_Task();
+//  TinyUSB_Device_FlushCDC();
+//}
 
 #endif
 

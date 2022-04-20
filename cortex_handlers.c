@@ -23,9 +23,9 @@
 //#include <stdio.h>
 
 /* RTOS Hooks */
-extern void svcHook(void);
-extern void pendSVHook(void);
-extern int sysTickHook(void);
+//extern void svcHook(void);
+//extern void pendSVHook(void);
+//extern int sysTickHook(void);
 
 /* Default empty handler */
 void Dummy_Handler(void)
@@ -504,8 +504,8 @@ extern void SysTick_DefaultHandler(void);
 
 void SysTick_Handler(void)
 {
-  if (sysTickHook())
-    return;
+//  if (sysTickHook())
+//    return;
   SysTick_DefaultHandler();
 }
 
