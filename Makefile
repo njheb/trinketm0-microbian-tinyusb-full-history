@@ -51,7 +51,7 @@ vpath %.h ./microbian
 #                $^ -nostdlib -lgcc -lc -o $@ -Wl,-Map,$*.map
 #        $(SIZE) $@
 
-%.elf: cortex_handlers.o startup.o temp-wiring.o hooks.o delay.o Reset.o blink.o force_bootloader.o
+%.elf: cortex_handlers.o startup.o temp-wiring.o hooks.o delay.o Reset.o blink.o force_bootloader.o polling-uart.o
 	$(CC) $(CPU) $(CFLAGS) -T ./variant-trinketm0/flash_with_bootloader.ld \
 		$^ -nostdlib -lgcc -lc -o $@ -Wl,-Map,$*.map
 	$(SIZE) $@
