@@ -1,5 +1,5 @@
 #include "SERCOM-cutdown.h"
-
+void SERCOM_initClockNVIC( void ); //remove warning without reordering
 //from WVariant.h
 typedef enum _EPioType
 {
@@ -218,6 +218,12 @@ void SERCOM_enableUART()
   while(sercom->USART.SYNCBUSY.bit.ENABLE);
 }
 
+bool SERCOM_isDataRegisterEmptyUART()
+{
+  //DRE : Data Register Empty
+  return sercom->USART.INTFLAG.bit.DRE;
+}
+
 void SERCOM_flushUART()
 {
   // Skip checking transmission completion if data register is empty
@@ -274,12 +280,6 @@ bool SERCOM_isParityErrorUART()
 {
   //PERR : Parity Error
   return sercom->USART.STATUS.bit.PERR;
-}
-
-bool SERCOM_isDataRegisterEmptyUART()
-{
-  //DRE : Data Register Empty
-  return sercom->USART.INTFLAG.bit.DRE;
 }
 
 uint8_t SERCOM_readDataUART()
@@ -424,15 +424,15 @@ static const struct {
   uint8_t   clock;
   IRQn_Type irqn;
 } sercomData[] = {
-  SERCOM0, GCM_SERCOM0_CORE, SERCOM0_IRQn,
-  SERCOM1, GCM_SERCOM1_CORE, SERCOM1_IRQn,
-  SERCOM2, GCM_SERCOM2_CORE, SERCOM2_IRQn,
-  SERCOM3, GCM_SERCOM3_CORE, SERCOM3_IRQn,
+  {SERCOM0, GCM_SERCOM0_CORE, SERCOM0_IRQn},
+  {SERCOM1, GCM_SERCOM1_CORE, SERCOM1_IRQn},
+  {SERCOM2, GCM_SERCOM2_CORE, SERCOM2_IRQn},
+  {SERCOM3, GCM_SERCOM3_CORE, SERCOM3_IRQn},
 #if defined(SERCOM4)
-  SERCOM4, GCM_SERCOM4_CORE, SERCOM4_IRQn,
+  {SERCOM4, GCM_SERCOM4_CORE, SERCOM4_IRQn},
 #endif
 #if defined(SERCOM5)
-  SERCOM5, GCM_SERCOM5_CORE, SERCOM5_IRQn,
+  {SERCOM5, GCM_SERCOM5_CORE, SERCOM5_IRQn},
 #endif
 };
 
