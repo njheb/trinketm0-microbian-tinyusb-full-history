@@ -5,7 +5,7 @@
  *
  * */
 #include "sam.h"
-#define IMPROPER
+//#define IMPROPER
 #ifdef IMPROPER
 #define GPIO_BASE 0x41004400
 #define PORTDIRSET 0x41004408
@@ -30,6 +30,8 @@ uint32_t port = 0;
 uint32_t pin = 10;
 uint32_t pinMask = (1ul << pin);
         init();
+
+        Uart_begin(9600);
 	/* Set output direction for LED pin*/
 #ifdef IMPROPER
 	gpio = (unsigned int*)PORTDIRSET;
@@ -41,7 +43,7 @@ uint32_t pinMask = (1ul << pin);
       PORT->Group[port].DIRSET.reg = pinMask;
 #endif
 #if defined(USE_TINYUSB)
-  TinyUSB_Device_Init(0);
+//  TinyUSB_Device_Init(0);
 #endif
 
 	/* Never exit */
@@ -51,6 +53,7 @@ uint32_t pinMask = (1ul << pin);
 
   if (count <= 1) //10ms * 10000 = 100secs ish, check this works before adding to microbian port for first test recovery
   {
+     Uart_end();
      force_bootloader();
   }
 
@@ -66,6 +69,7 @@ uint32_t pinMask = (1ul << pin);
                         yield();
                 }
 #else
+                Uart_write('X');
                 delay(500);
 #endif
 		/* Clear LED output pin*/
@@ -83,6 +87,7 @@ uint32_t pinMask = (1ul << pin);
                         yield();
                 }
 #else
+                Uart_write('Y');
                 delay(500);
 #endif
 		/* Set LED output pin*/
