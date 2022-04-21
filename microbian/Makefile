@@ -1,7 +1,8 @@
 # microbian/Makefile
 # Copyright (c) 2020 J. M. Spivey
 
-all: microbian.a startup.o
+#all: microbian.a startup.o
+all: microbian.a
 
 CPU = -mcpu=cortex-m0 -mthumb
 #CFLAGS = -O -g -Wall -ffreestanding
@@ -31,7 +32,9 @@ BODGE = cortex_handlers.o delay.o temp-wiring.o arduino-startup.o polling-uart.o
 
 MICROBIAN = microbian.o mpx-m0.o $(DRIVERS) lib.o $(BODGE)
 
-microbian.a: $(MICROBIAN)
+#microbian.a: $(MICROBIAN)
+
+microbian.a: $(MICROBIAN) startup.o
 	$(AR) cr $@ $^
 
 %.o: %.c

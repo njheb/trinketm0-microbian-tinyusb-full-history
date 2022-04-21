@@ -8,7 +8,7 @@
 
 MEMORY
 {
-  FLASH (rx) : ORIGIN = 0x00000000+0x2000, LENGTH = 0x00040000-0x2000 /* First 8KB used by bootloader */
+  FLASH (rx) : ORIGIN = 0x00002000, LENGTH = 0x00040000-0x2000 /* First 8KB used by bootloader */
   RAM (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00008000
 }
 
@@ -25,39 +25,6 @@ SECTIONS {
         *(.rodata*)
         . = ALIGN(4);
         __etext = .;
-
-        PROVIDE(nmi_handler = default_handler);
-        PROVIDE(hardfault_handler = default_handler);
-        PROVIDE(svc_handler = default_handler);
-        PROVIDE(pendsv_handler = default_handler);
-        PROVIDE(systick_handler = default_handler);
-/*
-        PROVIDE(uart_handler = default_handler);
-        PROVIDE(timer0_handler = default_handler);
-        PROVIDE(timer1_handler = default_handler);
-        PROVIDE(timer2_handler = default_handler);
-        PROVIDE(power_clock_handler = default_handler);
-        PROVIDE(radio_handler = default_handler);
-        PROVIDE(i2c_handler = default_handler);
-        PROVIDE(spi_handler = default_handler);
-        PROVIDE(gpiote_handler = default_handler);
-        PROVIDE(adc_handler = default_handler);
-        PROVIDE(rtc0_handler = default_handler);
-        PROVIDE(temp_handler = default_handler);
-        PROVIDE(rng_handler = default_handler);
-        PROVIDE(ecb_handler = default_handler);
-        PROVIDE(ccm_aar_handler = default_handler);
-        PROVIDE(wdt_handler = default_handler);
-        PROVIDE(rtc1_handler = default_handler);
-        PROVIDE(qdec_handler = default_handler);
-        PROVIDE(lpcomp_handler = default_handler);
-        PROVIDE(swi0_handler = default_handler);
-        PROVIDE(swi1_handler = default_handler);
-        PROVIDE(swi2_handler = default_handler);
-        PROVIDE(swi3_handler = default_handler);
-        PROVIDE(swi4_handler = default_handler);
-        PROVIDE(swi5_handler = default_handler);
-*/
     } > FLASH
 
     .data : AT (LOADADDR(.text) + SIZEOF(.text)) {

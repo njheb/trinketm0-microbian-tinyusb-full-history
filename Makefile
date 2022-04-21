@@ -51,6 +51,7 @@ vpath %.h ./microbian
 #                $^ -nostdlib -lgcc -lc -o $@ -Wl,-Map,$*.map
 #        $(SIZE) $@
 
+#%.elf: blink.o ./microbian/microbian.a ./microbian/startup.o force_bootloader.o
 %.elf: blink.o ./microbian/microbian.a force_bootloader.o
 	$(CC) $(CPU) $(CFLAGS) -T ./variant-trinketm0/microbian_flash_with_bootloader.ld \
 		$^ -nostdlib -lgcc -lc -o $@ -Wl,-Map,$*.map
