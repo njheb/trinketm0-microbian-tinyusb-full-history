@@ -197,6 +197,7 @@ extern uint32_t __StackTop;
 
 /* Exception Table */
 __attribute__ ((section(".isr_vector"))) const DeviceVectors exception_table =
+
 {
 	/* Configure Initial Stack Pointer, using linker-generated symbols */
 	(void*) (&__StackTop),
@@ -360,13 +361,15 @@ __attribute__ ((section(".isr_vector"))) const DeviceVectors exception_table =
 
 #else
 
+
+
 /* Cortex-M0+ core handlers */
 void HardFault_Handler(void) __attribute__ ((weak, alias("Dummy_Handler")));
-void Reset_Handler    (void);
+void __reset          (void);//void Reset_Handler    (void);
 void NMI_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void SVC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void PendSV_Handler   (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void SysTick_Handler  (void);
+void svc_handler      (void);//void SVC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void pendsvc_handler  (void);//void PendSV_Handler   (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void systick_handler  (void);//void SysTick_Handler  (void);
 
 /* Peripherals handlers */
 void PM_Handler       (void) __attribute__ ((weak, alias("Dummy_Handler")));
@@ -398,6 +401,9 @@ void DAC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
 void PTC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
 void I2S_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
 
+#if 0
+//using modified .ld from baremetal-v1/microbian
+//adjust for larger MEMORY of samd21
 /* Initialize segments */
 extern uint32_t __etext;
 extern uint32_t __data_start__;
@@ -405,14 +411,17 @@ extern uint32_t __data_end__;
 extern uint32_t __bss_start__;
 extern uint32_t __bss_end__;
 extern uint32_t __StackTop;
+#endif
 
+
+#if 0
 /* Exception Table */
-__attribute__ ((section(".isr_vector"))) const DeviceVectors exception_table =
+//__attribute__ ((section(".isr_vector"))) const DeviceVectors exception_table =
+void *__vectors[] __attribute((section(".vectors"))) = {
 {
   /* Configure Initial Stack Pointer, using linker-generated symbols */
-  (void*) (&__StackTop),
-
-  (void*) Reset_Handler,
+  __stack, //(void*) (&__StackTop),
+  (void*) __reset, //(void*) Reset_Handler,
   (void*) NMI_Handler,
   (void*) HardFault_Handler,
   (void*) (0UL), /* Reserved */
@@ -422,11 +431,11 @@ __attribute__ ((section(".isr_vector"))) const DeviceVectors exception_table =
   (void*) (0UL), /* Reserved */
   (void*) (0UL), /* Reserved */
   (void*) (0UL), /* Reserved */
-  (void*) SVC_Handler,
+  svc_handler, //(void*) SVC_Handler,
   (void*) (0UL), /* Reserved */
   (void*) (0UL), /* Reserved */
-  (void*) PendSV_Handler,
-  (void*) SysTick_Handler,
+  pendsvc_handler, //(void*) PendSV_Handler,
+  systick_handler, //(void*) SysTick_Handler,
 
   /* Configurable interrupts */
   (void*) PM_Handler,             /*  0 Power Manager */
@@ -459,54 +468,18 @@ __attribute__ ((section(".isr_vector"))) const DeviceVectors exception_table =
   (void*) I2S_Handler,            /* 27 Inter-IC Sound Interface */
   (void*) (0UL),                  /* Reserved */
 };
-
 #endif
+#endif //MICROBITSTUFF
 
-extern int main(void);
 
-/* This is called on processor reset to initialize the device and call main() */
-void Reset_Handler(void)
+
+//will have timer supported by a timercounter
+void systick_handler(void)
 {
-  uint32_t *pSrc, *pDest;
-
-  /* Initialize the initialized data section */
-  pSrc = &__etext;
-  pDest = &__data_start__;
-
-  if ((&__data_start__ != &__data_end__) && (pSrc != pDest)) {
-    for (; pDest < &__data_end__; pDest++, pSrc++)
-      *pDest = *pSrc;
-  }
-
-  /* Clear the zero section */
-  if ((&__data_start__ != &__data_end__) && (pSrc != pDest)) {
-    for (pDest = &__bss_start__; pDest < &__bss_end__; pDest++)
-      *pDest = 0;
-  }
-
-#if defined(__FPU_USED) && defined(__SAMD51__)
-	/* Enable FPU */
-	SCB->CPACR |= (0xFu << 20);
-	__DSB();
-	__ISB();
-#endif
-
-  SystemInit();
-
-  main();
-
-  while (1)
-    ;
-}
-
-/* Default Arduino systick handler */
-extern void SysTick_DefaultHandler(void);
-
-void SysTick_Handler(void)
-{
-//  if (sysTickHook())
-//    return;
-  SysTick_DefaultHandler();
+//  _ulTickCount++; //this is millisecond step scope problem
+// so leave this bodge in place for now
+    SysTick_DefaultHandler();
+//  tickReset();  //if CDC USB reset is implemented
 }
 
 static void (*usb_isr)(void) = NULL;

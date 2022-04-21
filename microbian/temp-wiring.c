@@ -64,7 +64,7 @@ void calibrateADC()
  *   - Watchdog is disabled by default, unless someone plays with NVM User page
  *   - During reset, all PORT lines are configured as inputs with input buffers, output buffers and pull disabled.
  */
-void init( void )
+void arduino_init( void )
 {
   // Set Systick to 1ms interval, common to all Cortex-M variants
   if ( SysTick_Config( SystemCoreClock / 1000 ) )

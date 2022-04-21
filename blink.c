@@ -25,11 +25,11 @@ extern void force_bootloader(void);
 int count = 100;
 //see WVariant.h EPortType port = PORTA;
 /** Main function - we'll never return from here */
-void main() {
+void init() {
 uint32_t port = 0;
 uint32_t pin = 10;
 uint32_t pinMask = (1ul << pin);
-        init();
+        //arduino_init(); called from __reset() now
 
         Uart_begin(9600);
 	/* Set output direction for LED pin*/
