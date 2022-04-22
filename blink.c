@@ -40,8 +40,8 @@ uint32_t pinMask = (1ul << pin);
    message m;
    //trimer_pulse(500);
    while (1) {
-	receive(ANY, &m);
-        client = m.sender;
+//	receive(ANY, &m);
+//        client = m.sender;
         count--;
 
   if (count <= 1) //10ms * 10000 = 100secs ish, check this works before adding to microbian port for first t$
@@ -58,10 +58,11 @@ uint32_t pinMask = (1ul << pin);
 #else
                 PORT->Group[port].OUTCLR.reg = pinMask;
 #endif
+       yield();
 
        // m.int1 = result;
        // send(client, REPLY, &m);
-       send(client, PINGPONG, &m);
+//       send(client, PINGPONG, &m);
    }
 }
 
@@ -74,8 +75,8 @@ uint32_t pinMask = (1ul << pin);
    //trimer_pulse(500);
    while (1) {
 
-	receive(ANY, &m);
-        client = m.sender;
+//	receive(ANY, &m);
+//        client = m.sender;
 
                 Uart_write('Y');
                 delay(500);
@@ -87,10 +88,10 @@ uint32_t pinMask = (1ul << pin);
                 PORT->Group[port].OUTSET.reg = pinMask;
 #endif
 
-
+       yield();
        // m.int1 = result;
        // send(client, REPLY, &m);
-       send(client, PINGPONG, &m);
+//       send(client, PINGPONG, &m);
    }
 }
 
@@ -158,7 +159,7 @@ uint32_t pinMask = (1ul << pin);
 #if defined(USE_TINYUSB)
 //  TinyUSB_Device_Init(0);
 #endif
-#if 0
+#if 1
   A_TASK = start("TestA", test_taskA, 0, STACK);
   B_TASK = start("TestB", test_taskB, 0, STACK);
 #else
