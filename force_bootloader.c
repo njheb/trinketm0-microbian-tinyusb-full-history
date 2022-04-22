@@ -1,5 +1,11 @@
 #include "sam.h"
 
+/*
+NJH2022Apr22 NOTE "BOOT_DOUBLE_TAP_ADDRESS" is very last 32bit word in RAM
+ so will trash last element of msp stack, but not really an issue as
+ NVIC_System_Reset() called immediately
+*/
+
 void force_bootloader(void)
 {
 #if defined(__SAMD51__)

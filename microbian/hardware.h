@@ -34,6 +34,48 @@ argument to be a macro that expands the a 'position, width' pair. */
 
 #define __MASK0(wid)  (~((-2) << (wid-1)))
 
+/* Interrupts */
+#define SVC_IRQ    -5
+#define PENDSV_IRQ -2
+
+#define PM_IRQ        0
+#define SYSCTRL_IRQ   1
+#define WD_IRQ        2
+#define RTC_IRQ       3
+#define EIC_IRQ       4
+#define NVMCTRL_IRQ   5
+#define DMAC_IRQ      6
+#define USB_IRQ       7
+#define EVSYS_IRQ     8
+#define SERCOM0_IRQ   9
+#define SERCOM1_IRQ   10
+#define SERCOM2_IRQ   11
+#define SERCOM3_IRQ   12
+#define SERCOM4_IRQ   13
+#define SERCOM5_IRQ   14
+#define TCC0_IRQ      15
+#define TCC1_IRQ      16
+#define TCC2_IRQ      17
+#define TC3_IRQ       18
+#define TC4_IRQ       19
+#define TC5_IRQ       20
+#define TC6_IRQ       21
+#define TC7_IRQ       22
+#define ADC_IRQ       23
+#define AC_IRQ        24
+#define DAC_IRQ       25
+#define PTC_IRQ       26
+#define I2S_IRQ       27
+
+#define UART_IRQ SERCOM0_IRQ
+//#define I2C_IRQ     
+//#define SPI_IRQ     
+
+//#define TIMER0_IRQ  
+//#define TIMER1_IRQ  
+//#define TIMER2_IRQ  
+//#define RTC0_IRQ ?number of instances
+
 #define N_INTERRUPTS 32 /*CHECK************************CHECK****************************CHECK*/
 
 

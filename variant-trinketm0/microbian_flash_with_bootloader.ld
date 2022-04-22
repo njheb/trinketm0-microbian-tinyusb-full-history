@@ -26,9 +26,6 @@ SECTIONS {
         . = ALIGN(4);
         __etext = .;
 
-/*       PROVIDE(svc_handler = default_handler);
-       PROVIDE(pendsv_handler = default_handler);
-*/
     } > FLASH
 
     .data : AT (LOADADDR(.text) + SIZEOF(.text)) {
