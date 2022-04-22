@@ -370,9 +370,9 @@ __attribute__ ((section(".isr_vector"))) const DeviceVectors exception_table =
 void HardFault_Handler(void) __attribute__ ((weak, alias("Dummy_Handler")));
 void __reset          (void);//void Reset_Handler    (void);
 void NMI_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-extern void svc_handler      (void);//void SVC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-extern void pendsvc_handler  (void);//void PendSV_Handler   (void) __attribute__ ((weak, alias("Dummy_Handler")));
-extern void systick_handler  (void);//void SysTick_Handler  (void);
+void svc_handler      (void);//void SVC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void pendsv_handler   (void);//void PendSV_Handler   (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void systick_handler  (void);//void SysTick_Handler  (void);
 
 /* Peripherals handlers */
 void PM_Handler       (void) __attribute__ ((weak, alias("Dummy_Handler")));
@@ -422,7 +422,7 @@ extern unsigned char __stack[];
 
 /* Exception Table */
 //__attribute__ ((section(".isr_vector"))) const DeviceVectors exception_table =
-void *__vectors[] __attribute((section(".vectors"))) =
+__attribute__ ((section(".vectors"))) void *__vectors[] =
 {
   /* Configure Initial Stack Pointer, using linker-generated symbols */
   __stack, //(void*) (&__StackTop),
@@ -439,7 +439,7 @@ void *__vectors[] __attribute((section(".vectors"))) =
   svc_handler, //(void*) SVC_Handler,
   (void*) (0UL), /* Reserved */
   (void*) (0UL), /* Reserved */
-  pendsvc_handler, //(void*) PendSV_Handler,
+  pendsv_handler, //(void*) PendSV_Handler,
   systick_handler, //(void*) SysTick_Handler,
 
   /* Configurable interrupts */

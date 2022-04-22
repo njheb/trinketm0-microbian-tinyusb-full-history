@@ -51,8 +51,12 @@ vpath %.h ./microbian
 #                $^ -nostdlib -lgcc -lc -o $@ -Wl,-Map,$*.map
 #        $(SIZE) $@
 
+APP = blink.o force_bootloader.o
+WORKAROUND = ./microbian/startup.o ./microbian/mpx-m0.o ./microbian/microbian.o \
+	./microbian/delay.o ./microbian/lib.o ./microbian/polling-uart.o
+#note cortex_handlers.c temp-wiring.c arduino-startup.c merged into startup.c
 #%.elf: blink.o ./microbian/microbian.a ./microbian/startup.o force_bootloader.o
-%.elf: blink.o ./microbian/microbian.a force_bootloader.o
+%.elf: $(APP) $(WORKAROUND)
 	$(CC) $(CPU) $(CFLAGS) -T ./variant-trinketm0/microbian_flash_with_bootloader.ld \
 		$^ -nostdlib -lgcc -lc -o $@ -Wl,-Map,$*.map
 	$(SIZE) $@

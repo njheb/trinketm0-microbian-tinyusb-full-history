@@ -536,3 +536,24 @@ void SERCOM_initClockNVIC( void )
 
 #endif // end !SAMD51
 }
+
+/* print_buf -- output routine for use by printf */
+void print_buf(char *buf, int n)
+{
+#if 0
+    /* Using sendrec() here avoids a potential priority inversion:
+       with separate send() and receive() calls, a lower-priority
+       client process can block a reply from the device driver. */
+
+    message m;
+    m.ptr1 = buf;
+    m.int2 = n;
+    sendrec(SERIAL_TASK, PUTBUF, &m);
+#else
+    for(int i = 0; i<n; i++)
+    {
+	Uart_write(buf[i]);
+    }
+#endif
+}
+

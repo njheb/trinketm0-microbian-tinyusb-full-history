@@ -678,7 +678,7 @@ static void kprintf_setup(void)
 {
     /* Delay so any UART activity can cease */
     delay_usec(2000);
-
+#if 0
     /* Set up pins to maintain signal levels while UART disabled */
     gpio_dir(USB_TX, 1); gpio_dir(USB_RX, 0); gpio_out(USB_TX, 1);
 
@@ -693,14 +693,21 @@ static void kprintf_setup(void)
     UART.STARTTX = 1;
     UART.STARTRX = 1;
     UART.RXDRDY = 0;
+#else
+    Uart_begin(9600);
+#endif
 }
 
 /* kputc -- send output character */
 static void kputc(char ch)
 {
+#if 0
     UART.TXD = ch;
     while (! UART.TXDRDY) { }
     UART.TXDRDY = 0;
+#else
+    Uart_write(ch);
+#endif
 }
 
 /* kprintf_internal -- internal version of kprintf */
