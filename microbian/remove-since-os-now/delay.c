@@ -23,6 +23,7 @@
 extern "C" {
 #endif
 
+#if 0
 /** Tick Counter united by ms */
 static volatile uint32_t _ulTickCount=0 ;
 
@@ -31,7 +32,7 @@ unsigned long millis( void )
 // todo: ensure no interrupts
   return _ulTickCount ;
 }
-
+#endif
 // Interrupt-compatible version of micros
 // Theory: repeatedly take readings of SysTick counter, millis counter and SysTick interrupt pending flag.
 // When it appears that millis counter and pending is stable and SysTick hasn't rolled over, use these
@@ -87,7 +88,7 @@ void delayMicroseconds(unsigned int us)
 }
 #endif
 
-
+#if 0
 void delay( unsigned long ms )
 {
   if (ms == 0)
@@ -116,7 +117,7 @@ void SysTick_DefaultHandler(void)
   _ulTickCount++;
 //  tickReset();
 }
-
+#endif
 #if defined(USE_TINYUSB)
 
 // run TinyUSB background task when yield()

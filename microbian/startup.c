@@ -659,6 +659,7 @@ void calibrateADC()
  */
 void arduino_init( void )  //renamed from init to avoid clash
 {
+#if 1
   // Set Systick to 1ms interval, common to all Cortex-M variants
   if ( SysTick_Config( SystemCoreClock / 1000 ) )
   {
@@ -666,7 +667,7 @@ void arduino_init( void )  //renamed from init to avoid clash
     while ( 1 ) ;
   }
   NVIC_SetPriority (SysTick_IRQn,  (1 << __NVIC_PRIO_BITS) - 2);  /* set Priority for Systick Interrupt (2nd lowest) */
-
+#endif
   // Clock PORT for Digital I/O
 //  PM->APBBMASK.reg |= PM_APBBMASK_PORT ;
 //
@@ -1470,7 +1471,7 @@ void __reset          (void);//void Reset_Handler    (void);
 void NMI_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
 void svc_handler      (void);//void SVC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
 void pendsv_handler  (void);//void PendSV_Handler   (void) __attribute__ ((weak, alias("Dummy_Handler")));
-extern void systick_handler  (void);//void SysTick_Handler  (void);
+void systick_handler  (void);//void SysTick_Handler  (void);
 
 /* Peripherals handlers */
 void PM_Handler       (void) __attribute__ ((weak, alias("Dummy_Handler")));
@@ -1575,13 +1576,16 @@ __attribute__ ((section(".vectors"))) void *__vectors[] =
 #endif //MICROBITSTUFF
 
 
-
+//void (*systick_isr)(void) = SysTick_DefaultHandler;
+void (*systick_isr)(void) = NULL;
 //will have timer supported by a timercounter
 void systick_handler(void)
 {
 //  _ulTickCount++; //this is millisecond step scope problem
 // so leave this bodge in place for now
-    SysTick_DefaultHandler();
+//    SysTick_DefaultHandler();
+    if (systick_isr)
+    systick_isr();
 //  tickReset();  //if CDC USB reset is implemented
 }
 

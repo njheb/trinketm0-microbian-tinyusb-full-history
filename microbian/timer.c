@@ -1,9 +1,11 @@
 /* timer.c */
 /* Copyright (c) 2018-2020 J. M. Spivey */
-
+#include "sam.h"
 #include "microbian.h"
 #include "hardware.h"
 
+extern uint32_t SystemCoreClock;
+extern void (*systick_isr)(void);
 static int TIMER_TASK;
 
 #ifdef UBIT_V2
@@ -11,7 +13,8 @@ static int TIMER_TASK;
 #endif
 
 #ifndef TICK
-#define TICK 5                  /* Sensible default */
+//#define TICK 5                  /* Sensible default */
+#define TICK 2   /*find balance for faster samd21*/
 #endif
 
 #define MAX_TIMERS 8
@@ -76,6 +79,7 @@ static void create(int client, int delay, int repeat)
     timer[i].period = repeat;
 }
 
+#if 0
 /* timer1_handler -- interrupt handler */
 void timer1_handler(void)
 {
@@ -86,11 +90,26 @@ void timer1_handler(void)
         interrupt(TIMER_TASK);
     }
 }
+#else
+
+//  1  2  3  4  5  1  2  3  4  5 <- 16MHz  
+//              I              I
+//111222333444555111222333444555 <- 48Mhz
+//  i  i  i  i  I  i  i  i  i  I if matching    
+//     I     I     I     I     I every even cycle gives 2ms TICK 
+//           I           I       every 4th  cycle
+void SysTick_DefaultHandler(void)
+{
+	millis++;
+        if (millis & 1) //slow down
+	   interrupt(TIMER_TASK);
+}
+#endif
 
 static void timer_task(int n)
 {
     message m;
-
+#if 0
     /* We use Timer 1 because its 16-bit mode is adequate for a clock
        with up to 1us resolution and 1ms period, leaving the 32-bit
        Timer 0 for other purposes. */
@@ -104,6 +123,10 @@ static void timer_task(int n)
     TIMER1.INTENSET = BIT(TIMER_INT_COMPARE0);
     TIMER1.START = 1;
     enable_irq(TIMER1_IRQ);
+#else
+   //dont replace replace NULL see if it doesn't lock
+    systick_isr = SysTick_DefaultHandler;
+#endif
 
     while (1) {
         receive(ANY, &m);
@@ -144,6 +167,8 @@ unsigned timer_now(void)
 if it does overflow, shorter durations can be measured by taking the
 difference of two readings with unsigned subtraction. */
 
+//will need to fix this up with code from delay, but beware type
+#ifdef ADVAVANCED
 /* timer_micros -- return microseconds since startup */
 unsigned timer_micros(void)
 {
@@ -178,6 +203,7 @@ unsigned timer_micros(void)
 
     return 1000 * my_millis + ticks1;
 }
+#endif
 
 /* timer_delay -- one-shot delay */
 void timer_delay(int msec)
