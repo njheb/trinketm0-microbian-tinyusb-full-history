@@ -4,12 +4,15 @@
  * Physical address from SAMD21E18A datasheet
  *
  * */
+//#define WITHOUT_SAM_H
+
+#ifndef WITHOUT_SAM_H
 #include "sam.h"
+#endif
 #include "./microbian/microbian.h"
 //#include "lib.h"
 
-//#define IMPROPER
-#ifdef IMPROPER
+#ifdef WITHOUT_SAM_H
 #define GPIO_BASE 0x41004400
 #define PORTDIRSET 0x41004408
 #define PORTOUT 0x41004410
@@ -21,30 +24,28 @@ static int A_TASK;
 static int B_TASK;
 #define PINGPONG 333
 
-/** GPIO Register set */
-volatile unsigned int* gpio;
 
 extern void force_bootloader(void);
 int count = 100;
+#ifndef WITHOUT_SAM_H
 uint32_t port = 0;
-uint32_t pin = 10;
+const uint32_t pin = 10;
+const uint32_t pinMask = (1ul << pin);
+#endif
 
 void test_taskA(int arg)
 {
-uint32_t pinMask = (1ul << pin);
-
-   int client;
+//   int client;
    message m;
-   //trimer_pulse(500);
+
    while (1) {
 	receive(PINGPONG, &m);
-        client = m.sender;
+//        client = m.sender;
 
         Uart_write('X');
 	/* Clear LED output pin*/
-#ifdef IMPROPER
-	gpio = (unsigned int*)PORTCLR;
-	*gpio = (1 << LED_GPIO_BIT);
+#ifdef WITHOUT_SAM_H
+	*(unsigned int*)PORTCLR = (1 << LED_GPIO_BIT);
 #else
         PORT->Group[port].OUTCLR.reg = pinMask;
 #endif
@@ -53,77 +54,29 @@ uint32_t pinMask = (1ul << pin);
 
 void test_taskB(int arg)
 {
-uint32_t pinMask = (1ul << pin);
-
-   int client;
+//   int client;
    message m;
-   //trimer_pulse(500);
    while (1) {
 	receive(PINGPONG, &m);
-        client = m.sender;
+//        client = m.sender;
 
         Uart_write('Y');
 		/* Set LED output pin*/
-#ifdef IMPROPER
-		gpio = (unsigned int*)PORTOUT;
-		*gpio = (1 << LED_GPIO_BIT);
+#ifdef WITHOUT_SAM_H
+	*(unsigned int*)PORTOUT = (1 << LED_GPIO_BIT);
 #else
-                PORT->Group[port].OUTSET.reg = pinMask;
+        PORT->Group[port].OUTSET.reg = pinMask;
 #endif
-
-   }
-}
-
-void test_taskC(int arg)
-{
-uint32_t pinMask = (1ul << pin);
-
-   int client;
-   message m;
-   //trimer_pulse(500);
-   while (1) {
-        count--;
-
-  if (count <= 1) //10ms * 10000 = 100secs ish, check this works before adding $
-  {
-     Uart_end();
-     force_bootloader();
-  }
-                Uart_write('X');
-                delay_loop(500000);
-                /* Clear LED output pin*/
-#ifdef IMPROPER
-                gpio = (unsigned int*)PORTCLR;
-                *gpio = (1 << LED_GPIO_BIT);
-#else
-                PORT->Group[port].OUTCLR.reg = pinMask;
-#endif
-
-
-                Uart_write('Y');
-                delay_loop(500000);
-		/* Set LED output pin*/
-#ifdef IMPROPER
-		gpio = (unsigned int*)PORTOUT;
-		*gpio = (1 << LED_GPIO_BIT);
-#else
-                PORT->Group[port].OUTSET.reg = pinMask;
-#endif
-
 
    }
 }
 
 void test_taskT(int arg)
 {
-uint32_t pinMask = (1ul << pin);
-
-   int client;
    message m;
-   timer_pulse(500);
+   timer_pulse(250);
    while (1) {
 	receive(PING, NULL);
-      //  client = m.sender;
         count--;
 
         if (count <= 1) //10ms * 10000 = 100secs ish, check this works before adding to microbian port for first t$
@@ -134,47 +87,28 @@ uint32_t pinMask = (1ul << pin);
         if (count&1)
             send(A_TASK, PINGPONG, &m);
         else
-            send(B_TASK, PINGPONG, &m); 
+            send(B_TASK, PINGPONG, &m);
    }
 }
 
-
-
-
 //see WVariant.h EPortType port = PORTA;
-/** Main function - we'll never return from here */
 void init() {
 	timer_init();
-uint32_t pinMask = (1ul << pin);
 
         //arduino_init(); called from __reset() now
 
         Uart_begin(9600);
 	/* Set output direction for LED pin*/
-#ifdef IMPROPER
-	gpio = (unsigned int*)PORTDIRSET;
-	*gpio |= (1 << LED_GPIO_BIT);
+#ifdef WITHOUT_SAM_H
+	* (unsigned int*)PORTDIRSET |= (1 << LED_GPIO_BIT);
 #else
       // enable input, to support reading back values, with pullups disabled
       PORT->Group[port].PINCFG[pin].reg = (uint8_t) (PORT_PINCFG_INEN | PORT_PINCFG_DRVSTR);
       // Set pin to output mode
       PORT->Group[port].DIRSET.reg = pinMask;
 #endif
-#if defined(USE_TINYUSB)
-//  TinyUSB_Device_Init(0);
-#endif
-#if 1
   A_TASK = start("TestA", test_taskA, 0, STACK);
   B_TASK = start("TestB", test_taskB, 0, STACK);
 
-//  start("TestC", test_taskC, 0, STACK);
-  start("TestTimer", test_taskT, 0, STACK);
-#endif
-   //may have to prime this from DefaultSysTick_Handler
-   //before a timer is implemented
-   //will probably crash if send called from here
-//   message m;
-//     send(A_TASK, PINGPONG, &m);
-
-
+           start("TestTimer", test_taskT, 0, STACK);
 }
