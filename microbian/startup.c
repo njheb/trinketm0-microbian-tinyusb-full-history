@@ -1464,46 +1464,43 @@ __attribute__ ((section(".isr_vector"))) const DeviceVectors exception_table =
 #else
 
 
-//should have alias seletable by define, either "spin" if using serial debug
-//or "Dummy_Handler" if over SWD
-//SWD more relevant for ItsyBitsy M0/M4 as SWD pins broken out easily available
 /* Cortex-M0+ core handlers */
-void HardFault_Handler(void) __attribute__ ((weak, alias("Dummy_Handler")));
-void __reset          (void);//void Reset_Handler    (void);
-void NMI_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void svc_handler      (void);//void SVC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void pendsv_handler   (void);//void PendSV_Handler   (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void systick_handler  (void);//void SysTick_Handler  (void);
+void hardfault_handler(void);
+void __reset          (void);
+void nmi_handler      (void);
+void svc_handler      (void);
+void pendsv_handler   (void);
+void systick_handler  (void);
 
 /* Peripherals handlers */
-void PM_Handler       (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void SYSCTRL_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void WDT_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void RTC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void EIC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void NVMCTRL_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void DMAC_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void USB_Handler      (void) __attribute__ ((weak));
-void EVSYS_Handler    (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void SERCOM0_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void SERCOM1_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void SERCOM2_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void SERCOM3_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void SERCOM4_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void SERCOM5_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void TCC0_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void TCC1_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void TCC2_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void TC3_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void TC4_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void TC5_Handler      (void) __attribute__ ((weak)); // Used in Tone.cpp
-void TC6_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void TC7_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void ADC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void AC_Handler       (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void DAC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void PTC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void I2S_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void PM_Handler       (void);
+void SYSCTRL_Handler  (void);
+void WDT_Handler      (void);
+void RTC_Handler      (void);
+void EIC_Handler      (void);
+void NVMCTRL_Handler  (void);
+void DMAC_Handler     (void);
+void USB_Handler      (void); /*special case override default_handler*/
+void EVSYS_Handler    (void);
+void SERCOM0_Handler  (void); /*UART*/
+void SERCOM1_Handler  (void);
+void SERCOM2_Handler  (void);
+void SERCOM3_Handler  (void);
+void SERCOM4_Handler  (void);
+void SERCOM5_Handler  (void);
+void TCC0_Handler     (void);
+void TCC1_Handler     (void);
+void TCC2_Handler     (void);
+void TC3_Handler      (void);
+void TC4_Handler      (void);
+void TC5_Handler      (void); /* was Used in Tone.cpp on arduino*/
+void TC6_Handler      (void);
+void TC7_Handler      (void);
+void ADC_Handler      (void);
+void AC_Handler       (void);
+void DAC_Handler      (void);
+void PTC_Handler      (void);
+void I2S_Handler      (void);
 
 #if 0
 //using modified .ld from baremetal-v1/microbian
@@ -1528,8 +1525,8 @@ __attribute__ ((section(".vectors"))) void *__vectors[] =
   /* Configure Initial Stack Pointer, using linker-generated symbols */
   __stack, //(void*) (&__StackTop),
   __reset, //(void*) Reset_Handler,
-  (void*) NMI_Handler,                       /*-14*/
-  (void*) HardFault_Handler,                 /*-13*/
+  (void*) nmi_handler,                       /*-14*/
+  (void*) hardfault_handler,                 /*-13*/
   (void*) (0UL), /* Reserved */
   (void*) (0UL), /* Reserved */
   (void*) (0UL), /* Reserved */

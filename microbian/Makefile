@@ -25,7 +25,7 @@ INCLUDE = -I ~/.arduino15/packages/adafruit/tools/CMSIS-Atmel/1.2.2/CMSIS/Device
 
 
 #DRIVERS = timer.o serial.o i2c.o radio.o display.o
-DRIVERS = timer.o
+DRIVERS = timer.o serial.o
 
 #BODGE = cortex_handlers.o delay.o temp-wiring.o arduino-startup.o polling-uart.o
 #moved code from temp-wiring.c and arduino-startup.c into startup.c
@@ -35,13 +35,11 @@ BODGE = polling-uart.o
 
 MICROBIAN = microbian.o mpx-m0.o $(DRIVERS) lib.o $(BODGE)
 
-#microbian.a: $(MICROBIAN)
-
 microbian.a: $(MICROBIAN)
 	$(AR) cr $@ $^
 
 %.o: %.c
-	$(CC) $(CPU) $(CFLAGS) $(INCLUDE) -c $< -o $@ 
+	$(CC) $(CPU) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
 %.o: %.s
 	$(AS) $(CPU) $< -o $@

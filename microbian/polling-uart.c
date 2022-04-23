@@ -1,4 +1,8 @@
 #include "SERCOM-cutdown.h"
+//#define XSTR(x) STR(x)
+//#define STR(x) #x
+
+
 void SERCOM_initClockNVIC( void ); //remove warning without reordering
 //from WVariant.h
 typedef enum _EPioType
@@ -297,6 +301,11 @@ int SERCOM_writeDataUART(uint8_t data)
   return 1;
 }
 
+void BODGE_writeDataUART(uint8_t data)
+{
+  sercom->USART.DATA.reg = (uint16_t)data;
+}
+
 void SERCOM_enableDataRegisterEmptyInterruptUART()
 {
   sercom->USART.INTENSET.reg = SERCOM_USART_INTENSET_DRE;
@@ -537,6 +546,8 @@ void SERCOM_initClockNVIC( void )
 #endif // end !SAMD51
 }
 
+#if 0
+causes multiple def if serial driver is compiled in
 /* print_buf -- output routine for use by printf */
 void print_buf(char *buf, int n)
 {
@@ -556,4 +567,6 @@ void print_buf(char *buf, int n)
     }
 #endif
 }
+#endif
+
 

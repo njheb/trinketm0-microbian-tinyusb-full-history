@@ -68,6 +68,7 @@ argument to be a macro that expands the a 'position, width' pair. */
 #define I2S_IRQ       27
 
 #define UART_IRQ SERCOM0_IRQ
+//SERCOM0_IRQn check value is 9
 //#define I2C_IRQ     
 //#define SPI_IRQ     
 
