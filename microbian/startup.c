@@ -1464,13 +1464,15 @@ __attribute__ ((section(".isr_vector"))) const DeviceVectors exception_table =
 #else
 
 
-
+//should have alias seletable by define, either "spin" if using serial debug
+//or "Dummy_Handler" if over SWD
+//SWD more relevant for ItsyBitsy M0/M4 as SWD pins broken out easily available
 /* Cortex-M0+ core handlers */
 void HardFault_Handler(void) __attribute__ ((weak, alias("Dummy_Handler")));
 void __reset          (void);//void Reset_Handler    (void);
 void NMI_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
 void svc_handler      (void);//void SVC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void pendsv_handler  (void);//void PendSV_Handler   (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void pendsv_handler   (void);//void PendSV_Handler   (void) __attribute__ ((weak, alias("Dummy_Handler")));
 void systick_handler  (void);//void SysTick_Handler  (void);
 
 /* Peripherals handlers */
@@ -1526,8 +1528,8 @@ __attribute__ ((section(".vectors"))) void *__vectors[] =
   /* Configure Initial Stack Pointer, using linker-generated symbols */
   __stack, //(void*) (&__StackTop),
   __reset, //(void*) Reset_Handler,
-  (void*) NMI_Handler,
-  (void*) HardFault_Handler,
+  (void*) NMI_Handler,                       /*-14*/
+  (void*) HardFault_Handler,                 /*-13*/
   (void*) (0UL), /* Reserved */
   (void*) (0UL), /* Reserved */
   (void*) (0UL), /* Reserved */
@@ -1535,11 +1537,11 @@ __attribute__ ((section(".vectors"))) void *__vectors[] =
   (void*) (0UL), /* Reserved */
   (void*) (0UL), /* Reserved */
   (void*) (0UL), /* Reserved */
-  svc_handler, //(void*) SVC_Handler,
+  svc_handler, //(void*) SVC_Handler,         /*-5*/
   (void*) (0UL), /* Reserved */
   (void*) (0UL), /* Reserved */
-  pendsv_handler, //(void*) PendSV_Handler,
-  systick_handler, //(void*) SysTick_Handler,
+  pendsv_handler, //(void*) PendSV_Handler,   /*-2*/
+  systick_handler, //(void*) SysTick_Handler, /*-1*/
 
   /* Configurable interrupts */
   (void*) PM_Handler,             /*  0 Power Manager */
