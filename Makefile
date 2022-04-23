@@ -24,7 +24,8 @@ CFLAGS= -Wall -g -nostartfiles -O -DF_CPU=48000000UL -ffreestanding \
 INCLUDE = -I ~/.arduino15/packages/adafruit/tools/CMSIS-Atmel/1.2.2/CMSIS/Device/ATMEL \
           -I ~/.arduino15/packages/adafruit/tools/CMSIS-Atmel/1.2.2/CMSIS/Device/ATMEL/samd21 \
           -I ~/.arduino15/packages/adafruit/tools/CMSIS/5.4.0/CMSIS/Core/Include \
-          -I ./variant-trinketm0
+          -I ./variant-trinketm0 \
+          -I ./microbian
 
 AS = arm-none-eabi-as
 LD = arm-none-eabi-ld
@@ -46,29 +47,16 @@ vpath %.h ./microbian
 %.o: %.s
 	$(AS) $(CPU) $< -o $@
 
-#%.elf: %.o adc-VDD-only.o ../microbian/microbian.a ../microbian/startup.o
-#        $(CC) $(CPU) $(CFLAGS) -T ../microbian/nRF51822.ld \
-#                $^ -nostdlib -lgcc -lc -o $@ -Wl,-Map,$*.map
-#        $(SIZE) $@
-
 APP = blink.o force_bootloader.o
-WORKAROUND = ./microbian/startup.o ./microbian/mpx-m0.o ./microbian/microbian.o \
-	./microbian/timer.o ./microbian/lib.o ./microbian/polling-uart.o
+
+WORKAROUND = ./microbian/startup.o ./microbian/microbian.a
+
 #note cortex_handlers.c temp-wiring.c arduino-startup.c merged into startup.c
-#%.elf: blink.o ./microbian/microbian.a ./microbian/startup.o force_bootloader.o
+#less good for obviously showing copyright but all comments left intact inside startup.c
 %.elf: $(APP) $(WORKAROUND)
 	$(CC) $(CPU) $(CFLAGS) -T ./variant-trinketm0/microbian_flash_with_bootloader.ld \
 		$^ -nostdlib -lgcc -lc -o $@ -Wl,-Map,$*.map
 	$(SIZE) $@
-
-
-
-#./microbian/microbian.a:
-#        $(MAKE) -C $(@D) all
-
-#build:
-#	${CC} ${CFLAGS} ${LFLAGS} *.c -o kernel.elf
-#	${OBJCOPY} kernel.elf -O binary kernel.bin
 
 disasm:
 	${OBJDUMP} -d kernel.elf > kernel.elf.asm
@@ -99,5 +87,4 @@ flash: kernel.bin
 
 ###
 
-#battery.o adc-VDD-only.o: microbian.h lib.h hardware.h
-
+blink.o force_bootloader.o: microbian.h lib.h hardware.h
