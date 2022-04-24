@@ -122,15 +122,18 @@ void irq_priority(int irq, unsigned priority);
 
 /* enable_irq -- enable interrupts from an IRQ */
 //#define enable_irq(irq)  NVIC.ISER[0] = BIT(irq)
-#define enable_irq(irq)  M_NVIC.ISER[0] = BIT(irq)
+//#define enable_irq(irq)  M_NVIC.ISER[0] = BIT(irq)
+#define enable_irq(irq)    NVIC_EnableIRQ(irq)
 
 /* disable_irq -- disable interrupts from a specific IRQ */
 //#define disable_irq(irq)  NVIC.ICER[0] = BIT(irq)
-#define disable_irq(irq)  M_NVIC.ICER[0] = BIT(irq)
+//#define disable_irq(irq)  M_NVIC.ICER[0] = BIT(irq)
+#define disable_irq(irq)    NVIC_DisableIRQ(irq)
 
 /* clear_pending -- clear pending interrupt from an IRQ */
 //#define clear_pending(irq)  NVIC.ICPR[0] = BIT(irq)
-#define clear_pending(irq)  M_NVIC.ICPR[0] = BIT(irq)
+//#define clear_pending(irq)  M_NVIC.ICPR[0] = BIT(irq)
+#define clear_pending(irq)  NVIC_ClearPendingIRQ(irq)
 
 /* reschedule -- request PendSV interrupt */
 //#define reschedule()  SCB.ICSR = BIT(SCB_ICSR_PENDSVSET)

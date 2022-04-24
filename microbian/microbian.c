@@ -1,6 +1,7 @@
 /* microbian.c */
 /* Copyright (c) 2018 J. M. Spivey */
 
+#include "sam.h"
 #include "microbian.h"
 #include "lib.h"
 #include "hardware.h"
