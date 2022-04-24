@@ -912,6 +912,7 @@ implemented.*/
 
 //njh TODO need to checkout this function
 /* irq_priority -- set priority for an IRQ to a value [0..255] */
+#if 0
 void irq_priority(int irq, unsigned prio)
 {
     if (irq < 0)
@@ -921,7 +922,7 @@ void irq_priority(int irq, unsigned prio)
 //?        SET_BYTE(NVIC->IPR[irq >> 2], irq & 0x3, prio);
         SET_BYTE(M_NVIC.ISPR[irq >> 2], irq & 0x3, prio);
 }
-     
+#endif 
 /* See hardware.h for macros enable_irq, disable_irq, 
 clear_pending, reschedule */
 

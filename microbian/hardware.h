@@ -95,12 +95,12 @@ _DEVICE _scb {
 #define   SCB_SCR_SLEEPONEXIT 1
 #define   SCB_SCR_SLEEPDEEP 2
 #define   SCB_SCR_SEVONPEND 4
-    _REGISTER(unsigned SHPR[3], 0x18);
+  /*  _REGISTER(unsigned SHPR[3], 0x18);*/ /*differs cm0 and cm0plus*/
 };
 
 #define M_SCB (* (volatile _DEVICE _scb *) 0xe000ed00)
 
-
+#if 0
 /* Nested vectored interupt controller */
 _DEVICE _nvic {
     _REGISTER(unsigned ISER[8], 0x100);
@@ -112,13 +112,14 @@ _DEVICE _nvic {
 
 //check address have datasheet for g need samd21e18a g and e seem equivalent
 #define M_NVIC (* (volatile _DEVICE _nvic *) 0xe000e100)
-
+#endif
 
 #if 1 //tentative not checked
 /* NVIC stuff */
 
 /* irq_priority -- set priority of an IRQ from 0 (highest) to 255 */
-void irq_priority(int irq, unsigned priority);
+//void irq_priority(int irq, unsigned priority); //check NVIC_SetPriority
+#define irq_priority(irq, priority) NVIC_SetPriority(irq, priority)
 
 /* enable_irq -- enable interrupts from an IRQ */
 //#define enable_irq(irq)  NVIC.ISER[0] = BIT(irq)
@@ -137,10 +138,30 @@ void irq_priority(int irq, unsigned priority);
 
 /* reschedule -- request PendSV interrupt */
 //#define reschedule()  SCB.ICSR = BIT(SCB_ICSR_PENDSVSET)
-#define reschedule()  M_SCB.ICSR = BIT(SCB_ICSR_PENDSVSET)
+//#define reschedule()  M_SCB.ICSR = BIT(SCB_ICSR_PENDSVSET) //28U is correct
+
+#define reschedule() SCB->ICSR=SCB_ICSR_PENDSVSET_Msk
+/*
+SCB->ICSR = SCB_ICSR_PENDSVSET_Msk
+~/.arduino15/packages/adafruit/tools/CMSIS/5.4.0/CMSIS/Core/Include/core_cm0plus.h
+#define SCB_ICSR_PENDSVSET_Msk             (1UL << SCB_ICSR_PENDSVSET_Pos)                /*!< SCB ICSR: PENDSVSET Mask */
+
+
+/*
+exceptionNumber = (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk)
+*/
+
+
 
 /* active_irq -- find active interrupt: returns -16 to 31 */
 //#define active_irq()  (GET_FIELD(SCB.ICSR, SCB_ICSR_VECTACTIVE) - 16)
+/*
+#define SCB_ICSR_VECTACTIVE_Pos             0U 
+#define SCB_ICSR_VECTACTIVE_Msk            (0x1FFUL /*<< SCB_ICSR_VECTACTIVE_Po$
+
+*/
+
+/*info says NVIC_GetActive() not available on Cortex-M0+*/
 #define active_irq()  (GET_FIELD(M_SCB.ICSR, SCB_ICSR_VECTACTIVE) - 16)
 #endif
 /* delay_loop -- timed delay */
