@@ -161,10 +161,17 @@ void SERCOM_initUART(SercomUartMode mode, SercomUartSampleRate sampleRate, uint3
   sercom->USART.CTRLA.reg = SERCOM_USART_CTRLA_MODE(mode) |
                             SERCOM_USART_CTRLA_SAMPR(sampleRate);
 
+#if 0
+//moving to call from serial driver
   //Setting the Interrupt register
   sercom->USART.INTENSET.reg = SERCOM_USART_INTENSET_RXC |  //Received complete
                                SERCOM_USART_INTENSET_ERROR; //All others errors
+#else
+  sercom->USART.INTENSET.reg = SERCOM_USART_INTENSET_DRE |
+				SERCOM_USART_INTENSET_RXC |  //Received complete
+                               SERCOM_USART_INTENSET_ERROR; //All others errors
 
+#endif
   if ( mode == UART_INT_CLOCK )
   {
     uint16_t sampleRateValue;
@@ -314,6 +321,14 @@ void SERCOM_enableDataRegisterEmptyInterruptUART()
 void SERCOM_disableDataRegisterEmptyInterruptUART()
 {
   sercom->USART.INTENCLR.reg = SERCOM_USART_INTENCLR_DRE;
+}
+
+void BODGE_enableRelevantInterruptUART(void)
+{
+  //Setting the Interrupt register
+  sercom->USART.INTENSET.reg =  SERCOM_USART_INTENSET_DRE |
+				SERCOM_USART_INTENSET_RXC |  //Received complete
+                               SERCOM_USART_INTENSET_ERROR; //All others errors
 }
 
 //more code available at the bottom of  SERCOM.cpp
@@ -530,11 +545,14 @@ void SERCOM_initClockNVIC( void )
   uint8_t   clockId = sercomData[idx].clock;
   IRQn_Type IdNvic  = sercomData[idx].irqn;
 
+//njh see if this stops panic in with serial driver
   // Setting NVIC
+#if 1
+
   NVIC_ClearPendingIRQ(IdNvic);
   NVIC_SetPriority(IdNvic, SERCOM_NVIC_PRIORITY);
   NVIC_EnableIRQ(IdNvic);
-
+#endif
   // Setting clock
   GCLK->CLKCTRL.reg =
     GCLK_CLKCTRL_ID( clockId ) | // Generic Clock 0 (SERCOMx)
