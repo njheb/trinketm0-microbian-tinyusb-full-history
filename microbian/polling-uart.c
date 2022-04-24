@@ -547,7 +547,7 @@ void SERCOM_initClockNVIC( void )
 
 //njh see if this stops panic in with serial driver
   // Setting NVIC
-#if 0
+#if 1
 
   NVIC_ClearPendingIRQ(IdNvic);
   NVIC_SetPriority(IdNvic, SERCOM_NVIC_PRIORITY);

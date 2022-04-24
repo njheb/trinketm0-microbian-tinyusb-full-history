@@ -166,10 +166,16 @@ static void serial_interrupt(void)
     }
 #endif
 
-//    clear_pending(UART_IRQ);
-//    enable_irq(UART_IRQ);
-  NVIC_ClearPendingIRQ(9);
-  NVIC_EnableIRQ(9);
+   if (SERCOM_isUARTError())
+	SERCOM_clearStatusUART();
+
+   
+    BODGE_writeDataUART('i'); //debugging
+
+    clear_pending(UART_IRQ);
+    enable_irq(UART_IRQ);
+//  NVIC_ClearPendingIRQ(9);
+//  NVIC_EnableIRQ(9);
 }
 #endif
 
@@ -195,6 +201,8 @@ static void reply(void)
 #else
         //sercom->USART.DATA.reg = (uint16_t) txbuf[tx_outp];
         BODGE_writeDataUART(txbuf[tx_outp]);
+//        BODGE_writeDataUART('X'); //debugging
+
 #endif
         tx_outp = wrap(tx_outp+1);
         n_tx--;
@@ -239,6 +247,7 @@ static void serial_task(int arg)
 #else
     txidle = 1;
     connect(UART_IRQ);
+//    enable_irq(UART_IRQ);
 
     Uart_begin(9600);
 //check what level SERCOM_NVIC_PRIORITY is set at
@@ -253,13 +262,13 @@ static void serial_task(int arg)
     UART.INTENSET = BIT(UART_INT_RXDRDY) | BIT(UART_INT_TXDRDY);
 #else
   //  SERCOM_enableDataRegisterEmptyInterruptUART();
-//    BODGE_enableRelevantInterruptUART();
+  //  BODGE_enableRelevantInterruptUART();
 //RXINT enabled at init in arduino, also all errors INT bit
 
 #endif
 
 //    connect(UART_IRQ);
-//    enable_irq(UART_IRQ);
+    enable_irq(UART_IRQ);
 
 //    txidle = 1;
 
