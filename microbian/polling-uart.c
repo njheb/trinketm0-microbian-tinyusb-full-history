@@ -161,7 +161,7 @@ void SERCOM_initUART(SercomUartMode mode, SercomUartSampleRate sampleRate, uint3
   sercom->USART.CTRLA.reg = SERCOM_USART_CTRLA_MODE(mode) |
                             SERCOM_USART_CTRLA_SAMPR(sampleRate);
 
-#if 0
+#if 1
 //moving to call from serial driver
   //Setting the Interrupt register
   sercom->USART.INTENSET.reg = SERCOM_USART_INTENSET_RXC |  //Received complete
@@ -547,7 +547,7 @@ void SERCOM_initClockNVIC( void )
 
 //njh see if this stops panic in with serial driver
   // Setting NVIC
-#if 1
+#if 0
 
   NVIC_ClearPendingIRQ(IdNvic);
   NVIC_SetPriority(IdNvic, SERCOM_NVIC_PRIORITY);
