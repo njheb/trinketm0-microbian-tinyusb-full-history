@@ -170,10 +170,10 @@ static void serial_interrupt(void)
 	SERCOM_clearStatusUART();
 
    
-    BODGE_writeDataUART('i'); //debugging
+//    BODGE_writeDataUART('i'); //debugging
 
 //    clear_pending(UART_IRQ);
-//    enable_irq(UART_IRQ);
+//   enable_irq(UART_IRQ);
   NVIC_ClearPendingIRQ(9);
   NVIC_EnableIRQ(9);
 }
