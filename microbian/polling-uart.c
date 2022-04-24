@@ -550,7 +550,7 @@ void SERCOM_initClockNVIC( void )
 #if 1
 
   NVIC_ClearPendingIRQ(IdNvic);
-  NVIC_SetPriority(IdNvic, SERCOM_NVIC_PRIORITY);
+//  NVIC_SetPriority(IdNvic, SERCOM_NVIC_PRIORITY);
   NVIC_EnableIRQ(IdNvic);
 #endif
   // Setting clock
