@@ -11,8 +11,8 @@
 #include "mcu_pins.h"
 #endif
 #include "microbian.h"
-//#include "./microbian/microbian.h"
 //#include "lib.h"
+#include <string.h>
 
 #ifdef WITHOUT_SAM_H
 #define GPIO_BASE 0x41004400
@@ -44,7 +44,13 @@ void test_taskA(int arg)
 	receive(PINGPONG, &m);
 //        client = m.sender;
 
-        Uart_write('X');
+//        Uart_write('X');
+//        printf("X %d\n", count);
+          printf("%d\n", count);
+//        serial_putc('G');
+//        serial_putc('H');
+//        serial_putc('\n');
+
 	/* Clear LED output pin*/
 #ifdef WITHOUT_SAM_H
 	*(unsigned int*)PORTCLR = (1 << LED_GPIO_BIT);
@@ -62,7 +68,8 @@ void test_taskB(int arg)
 	receive(PINGPONG, &m);
 //        client = m.sender;
 
-        Uart_write('Y');
+//        Uart_write('Y');
+//        printf("Y %d\n", count);
 		/* Set LED output pin*/
 #ifdef WITHOUT_SAM_H
 	*(unsigned int*)PORTOUT = (1 << LED_GPIO_BIT);
@@ -96,10 +103,9 @@ void test_taskT(int arg)
 //see WVariant.h EPortType port = PORTA;
 void init() {
 	timer_init();
+        serial_init();
 
-        //arduino_init(); called from __reset() now
-
-        Uart_begin(9600);
+//        Uart_begin(9600);
 	/* Set output direction for LED pin*/
 #ifdef WITHOUT_SAM_H
 	* (unsigned int*)PORTDIRSET |= (1 << LED_GPIO_BIT);

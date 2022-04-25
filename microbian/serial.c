@@ -172,7 +172,7 @@ static void serial_interrupt(void)
    
 //    BODGE_writeDataUART('i'); //debugging
 
-    clear_pending(UART_IRQ);
+    //clear_pending(UART_IRQ);
    enable_irq(UART_IRQ);
 //  NVIC_ClearPendingIRQ(9);
 //  NVIC_EnableIRQ(9);
@@ -268,9 +268,9 @@ static void serial_task(int arg)
 #endif
 
 //    connect(UART_IRQ);
-    enable_irq(UART_IRQ);
+//    enable_irq(UART_IRQ);
 
-//    txidle = 1;
+    txidle = 1;
 
     while (1) {
         receive(ANY, &m);
