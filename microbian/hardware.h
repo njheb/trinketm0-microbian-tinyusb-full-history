@@ -144,7 +144,7 @@ _DEVICE _nvic {
 /*
 SCB->ICSR = SCB_ICSR_PENDSVSET_Msk
 ~/.arduino15/packages/adafruit/tools/CMSIS/5.4.0/CMSIS/Core/Include/core_cm0plus.h
-#define SCB_ICSR_PENDSVSET_Msk             (1UL << SCB_ICSR_PENDSVSET_Pos)                /*!< SCB ICSR: PENDSVSET Mask */
+#define SCB_ICSR_PENDSVSET_Msk             (1UL << SCB_ICSR_PENDSVSET_Pos)                */
 
 
 /*
@@ -157,7 +157,7 @@ exceptionNumber = (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk)
 //#define active_irq()  (GET_FIELD(SCB.ICSR, SCB_ICSR_VECTACTIVE) - 16)
 /*
 #define SCB_ICSR_VECTACTIVE_Pos             0U 
-#define SCB_ICSR_VECTACTIVE_Msk            (0x1FFUL /*<< SCB_ICSR_VECTACTIVE_Po$
+#define SCB_ICSR_VECTACTIVE_Msk            (0x1FFUL 
 
 */
 

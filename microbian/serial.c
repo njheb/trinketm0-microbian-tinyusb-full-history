@@ -108,27 +108,10 @@ from setting it again. */
 /* serial_interrupt -- handle serial interrupt */
 
 //njh see Uart.cpp void Uart::IrqHandler()
-#if 0
-static void serial_interrupt(void)
-{
-    if (UART.RXDRDY) {
-        char ch = UART.RXD;
-        keypress(ch);
-        UART.RXDRDY = 0;
-    }
-
-    if (UART.TXDRDY) {
-        txidle = 1;
-        UART.TXDRDY = 0;
-    }
-
-    clear_pending(UART_IRQ);
-    enable_irq(UART_IRQ);
-}
-#else
 static void serial_interrupt(void)
 {
 //njh check frame error 
+/*
 #if 1
   if (SERCOM_isFrameErrorUART()) {
     // frame error, next byte is invalid so read and discard it
@@ -136,48 +119,30 @@ static void serial_interrupt(void)
     SERCOM_clearFrameErrorUART();
   }
 #endif
-#if 0
-    if (UART.RXDRDY) {
-        char ch = UART.RXD;
-        keypress(ch);
-        UART.RXDRDY = 0;
-    }
-#else
+*/
     //RXC : Receive Complete?
     //if (sercom->USART.INTFLAG.bit.RXC) {
     if (SERCOM_availableDataUART())  {
         //char ch = sercom->USART.DATA.bit.DATA;
         char ch = SERCOM_readDataUART();
         keypress(ch);
+        BODGE_clearRXC();
         //? .RCX = 0 is it equiv hardware
     }
-#endif
 
-#if 0
-    if (UART.TXDRDY) {
-        txidle = 1;
-        UART.TXDRDY = 0;
-    }
-#else
 //    if (sercom->USART.INTFLAG.bit.DRE) {
-    if (SERCOM_isDataRegisterEmptyUART()) {
+//    if (SERCOM_isDataRegisterEmptyUART()) {
+    if (SERCOM_isTXCUART()) {
         txidle = 1;
-        //? .DRE = 0 is it equiv hardware 
+        BODGE_clearTXC();
     }
-#endif
-
+/*
    if (SERCOM_isUARTError())
 	SERCOM_clearStatusUART();
-
-   
-//    BODGE_writeDataUART('i'); //debugging
-
-    //clear_pending(UART_IRQ);
+*/ 
+   clear_pending(UART_IRQ);
    enable_irq(UART_IRQ);
-//  NVIC_ClearPendingIRQ(9);
-//  NVIC_EnableIRQ(9);
 }
-#endif
 
 /* reply -- send reply or start transmitter if possible */
 static void reply(void)
@@ -195,15 +160,8 @@ static void reply(void)
 
     /* Can we start transmitting a character? */
     if (txidle && n_tx > 0) {
-//njh 
-#if 0
-        UART.TXD = txbuf[tx_outp];
-#else
         //sercom->USART.DATA.reg = (uint16_t) txbuf[tx_outp];
         BODGE_writeDataUART(txbuf[tx_outp]);
-//        BODGE_writeDataUART('X'); //debugging
-
-#endif
         tx_outp = wrap(tx_outp+1);
         n_tx--;
         txidle = 0;
@@ -232,43 +190,27 @@ static void serial_task(int arg)
     int client, n;
     char ch;
     char *buf;
-//njh
-#if 0
-    UART.ENABLE = UART_ENABLE_Disabled;
-    UART.BAUDRATE = UART_BAUDRATE_9600; /* 9600 baud */
-    UART.CONFIG = FIELD(UART_CONFIG_PARITY, UART_PARITY_None);
-                                        /* format 8N1 */
-    UART.PSELTXD = TX;                  /* choose pins */
-    UART.PSELRXD = RX;
-    UART.ENABLE = UART_ENABLE_Enabled;
-    UART.STARTTX = 1;
-    UART.STARTRX = 1;
-    UART.RXDRDY = 0;
-#else
-    txidle = 1;
-    connect(UART_IRQ);
+//    txidle = 1;
+//    connect(UART_IRQ);
 //    enable_irq(UART_IRQ);
 
     Uart_begin(9600);
+    disable_irq(UART_IRQ);
+    clear_pending(UART_IRQ);
 //check what level SERCOM_NVIC_PRIORITY is set at
-//NB SERCOM_initUART enables these INT bits
+//NB originally SERCOM_initUART enabled these INT bits
 // sercom->USART.INTENSET.reg = SERCOM_USART_INTENSET_RXC |  //Received complete
 //                              SERCOM_USART_INTENSET_ERROR; //All others errors
 
 
-#endif
-//njh
-#if 0
-    UART.INTENSET = BIT(UART_INT_RXDRDY) | BIT(UART_INT_TXDRDY);
-#else
   //  SERCOM_enableDataRegisterEmptyInterruptUART();
-  //  BODGE_enableRelevantInterruptUART();
+
+//    BODGE_enableRelevantInterruptUART();
+    BODGE_enableSubsetInterruptUART();
 //RXINT enabled at init in arduino, also all errors INT bit
 
-#endif
-
-//    connect(UART_IRQ);
-//    enable_irq(UART_IRQ);
+    connect(UART_IRQ);
+    enable_irq(UART_IRQ);
 
     txidle = 1;
 
@@ -348,14 +290,3 @@ void print_buf(char *buf, int n)
     sendrec(SERIAL_TASK, PUTBUF, &m);
 }
 
-
-
-
-
-/*
-void SERCOM0_Handler()
-{
-//  Serial1.IrqHandler();
-  Serial1_IrqHandler();
-}
-*/

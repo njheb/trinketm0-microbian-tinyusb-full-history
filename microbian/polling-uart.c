@@ -126,19 +126,6 @@ Uart Serial1( &sercom0, PIN_SERIAL1_RX, PIN_SERIAL1_TX, PAD_SERIAL1_RX, PAD_SERI
 #endif
 
 #include "mcu_pins.h"
-#if 0
-#ifdef ADAFRUIT_TRINKET_M0
-#define PIN_REAL_LED 10
-#define PIN_REAL_RX 7
-#define PIN_REAL_TX 6
-#else
-//itsybitsy find define
-//itsybitsy find define
-#define PIN_REAL_LED 17
-#define PIN_REAL_RX 11
-#define PIN_REAL_TX 10
-#endif
-#endif
 
 #define PAD_SERIAL1_RX       (SERCOM_RX_PAD_3)   //see SERCOM.h = 3 enum
 #define PAD_SERIAL1_TX       (UART_TX_PAD_2)     //see SERCOM.h = 0x1ul enum
@@ -177,15 +164,19 @@ void SERCOM_initUART(SercomUartMode mode, SercomUartSampleRate sampleRate, uint3
   sercom->USART.CTRLA.reg = SERCOM_USART_CTRLA_MODE(mode) |
                             SERCOM_USART_CTRLA_SAMPR(sampleRate);
 
-#if 1
+#if 0
 //moving to call from serial driver
   //Setting the Interrupt register
   sercom->USART.INTENSET.reg = SERCOM_USART_INTENSET_RXC |  //Received complete
                                SERCOM_USART_INTENSET_ERROR; //All others errors
 #else
+/*
   sercom->USART.INTENSET.reg = SERCOM_USART_INTENSET_DRE |
 				SERCOM_USART_INTENSET_RXC |  //Received complete
                                SERCOM_USART_INTENSET_ERROR; //All others errors
+*/
+//  sercom->USART.INTENSET.reg = SERCOM_USART_INTENSET_RXC   //Received complete
+//                               ; //All others errors
 
 #endif
   if ( mode == UART_INT_CLOCK )
@@ -273,6 +264,12 @@ bool SERCOM_availableDataUART()
   return sercom->USART.INTFLAG.bit.RXC;
 }
 
+bool SERCOM_isTXCUART()
+{
+  //TXC : Transmit Complete
+  return sercom->USART.INTFLAG.bit.TXC;
+}
+
 bool SERCOM_isUARTError()
 {
   return sercom->USART.INTFLAG.bit.ERROR;
@@ -339,12 +336,39 @@ void SERCOM_disableDataRegisterEmptyInterruptUART()
   sercom->USART.INTENCLR.reg = SERCOM_USART_INTENCLR_DRE;
 }
 
+
 void BODGE_enableRelevantInterruptUART(void)
 {
   //Setting the Interrupt register
   sercom->USART.INTENSET.reg =  SERCOM_USART_INTENSET_DRE |
 				SERCOM_USART_INTENSET_RXC |  //Received complete
                                SERCOM_USART_INTENSET_ERROR; //All others errors
+}
+
+void BODGE_enableSubsetInterruptUART(void)
+{
+  //Setting the Interrupt register
+//maybe consider TXC inplace of DRE
+  sercom->USART.INTENSET.reg =  SERCOM_USART_INTENSET_TXC |
+				SERCOM_USART_INTENSET_RXC ;  //Received complete
+}
+
+void BODGE_disableRelevantInterruptUART(void)
+{
+  //Setting the Interrupt register
+  sercom->USART.INTENCLR.reg =  SERCOM_USART_INTENCLR_DRE |
+				SERCOM_USART_INTENCLR_RXC |  //Received complete
+                               SERCOM_USART_INTENCLR_ERROR; //All others errors
+}
+
+void BODGE_clearTXC(void)
+{
+   sercom->USART.INTFLAG.reg = SERCOM_USART_INTFLAG_TXC;
+}
+
+void BODGE_clearRXC(void)
+{
+   sercom->USART.INTFLAG.reg = SERCOM_USART_INTFLAG_RXC;
 }
 
 //more code available at the bottom of  SERCOM.cpp
@@ -392,10 +416,11 @@ void Uart_begin(unsigned long baudrate) //config fixed at 8N1
 {
 
 //trinket m0 specific
-//          rx=ulPin3->7  =ulPeripheral
- pinPeripheralUART(PIN_REAL_RX, PIO_SERCOM_ALT);  //see wiring_private.[ch]
-//            tx=ulPin4->6
- pinPeripheralUART(PIN_REAL_TX, PIO_SERCOM_ALT);
+//          rx=ulPin3->7  =ulPeripheral uses PIO_SERCOM_ALT 
+
+ pinPeripheralUART(PIN_REAL_RX, UART_PIO);  //see wiring_private.[ch]
+//            tx=ulPin4->6 uses PIO_SERCOM_ALT
+ pinPeripheralUART(PIN_REAL_TX, UART_PIO);
 
   SERCOM_initUART(UART_INT_CLOCK, SAMPLE_RATE_x16, baudrate);
 //  SERCOM_initFrame(extractCharSize(config), LSB_FIRST, extractParity(config), extractNbStopBit(config));

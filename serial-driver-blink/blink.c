@@ -69,7 +69,7 @@ void test_taskB(int arg)
 //        client = m.sender;
 
 //        Uart_write('Y');
-//        printf("Y %d\n", count);
+        printf("Y %d\n", count);
 		/* Set LED output pin*/
 #ifdef WITHOUT_SAM_H
 	*(unsigned int*)PORTOUT = (1 << LED_GPIO_BIT);
