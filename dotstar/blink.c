@@ -57,6 +57,8 @@ See ~/Arduino/libraries/Adafruit_BusIO/Adafruit_SPIDevice.*
 */
 
 //#define WITHOUT_SAM_H
+
+#include "onboard_dotstar.h"
 #ifndef WITHOUT_SAM_H
 #include "sam.h"
 #endif
@@ -119,7 +121,8 @@ void test_taskB(int arg)
    while (1) {
 	receive(PINGPONG, &m);
 //        client = m.sender;
-//        dotstar_show_yellow();
+        //dotstar_show(DOT_BLACK);
+        dotstar_show(DOT_BLACK);
         Uart_write('Y');
 		/* Set LED output pin*/
 #ifdef WITHOUT_SAM_H
@@ -157,7 +160,7 @@ void init() {
         dotstar_init();
 //        delayMicroseconds(5);
         //dotstar_show();
-        dotstar_show_yellow();
+//        dotstar_show_yellow();
 
         //dotstar_show(); //using 2uS period for first go, calculates as 0
         //arduino_init(); called from __reset() now

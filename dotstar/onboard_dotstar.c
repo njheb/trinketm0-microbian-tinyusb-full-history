@@ -3,10 +3,15 @@
 https://en.wikipedia.org/wiki/Serial_Peripheral_Interface#Clock_polarity_and_phase
 */
 //typedef char uint8_t;
+#include "onboard_dotstar.h"
 #include "sam.h"
 #include "delay.h"
 //#define WITHOUT_SAM_H
 #include "mcu_pins.h"
+#include "microbian.h"
+#include "hardware.h"
+
+static int DOTSTAR_TASK;  /* PID of driver process*/
 
 #ifdef WITHOUT_SAM_H
 #define GPIO_BASE 0x41004400
@@ -16,52 +21,34 @@ https://en.wikipedia.org/wiki/Serial_Peripheral_Interface#Clock_polarity_and_pha
 #define LED_GPIO_BIT PIN_REAL_LED
 //reverse DOTSTAR bits for itsybitsym0
 #endif
+
 #define DOTSTAR_GPIO_CLK_BIT 1
 #define DOTSTAR_GPIO_DAT_BIT 0
 
 /*NB looks like need to checkout working of digitalWrite()*/
 
-void dotstar_clk_hi(void)
+static void dotstar_clk_hi(void)
 {
 //   *(unsigned int*)PORTOUT = (1 << DOTSTAR_GPIO_CLK_BIT);
      PORT->Group[0].OUTSET.reg = (1 << DOTSTAR_GPIO_CLK_BIT);
 }
 
-void dotstar_clk_lo(void)
+static void dotstar_clk_lo(void)
 {
 //   *(unsigned int*)PORTCLR = (1 << DOTSTAR_GPIO_CLK_BIT);
      PORT->Group[0].OUTCLR.reg = (1 << DOTSTAR_GPIO_CLK_BIT); 
 }
 
-void dotstar_dat_hi(void)
+static void dotstar_dat_hi(void)
 {
 //   *(unsigned int*)PORTOUT = (1 << DOTSTAR_GPIO_DAT_BIT);
      PORT->Group[0].OUTSET.reg =  (1 << DOTSTAR_GPIO_DAT_BIT);
 }
 
-void dotstar_dat_lo(void)
+static void dotstar_dat_lo(void)
 {
 //   *(unsigned int*)PORTCLR = (1 << DOTSTAR_GPIO_DAT_BIT);
    PORT->Group[0].OUTCLR.reg = (1 << DOTSTAR_GPIO_DAT_BIT);
-}
-
-void dotstar_init(void)
-{
-#if 1
-// enable input, to support reading back values, with pullups disabled
- PORT->Group[0].PINCFG[DOTSTAR_GPIO_DAT_BIT].reg = (uint8_t) (PORT_PINCFG_INEN | PORT_PINCFG_DRVSTR);
-// Set pin to output mode
- PORT->Group[0].DIRSET.reg = 1<<DOTSTAR_GPIO_DAT_BIT;
-// enable input, to support reading back values, with pullups disabled
- PORT->Group[0].PINCFG[DOTSTAR_GPIO_CLK_BIT].reg = (uint8_t) (PORT_PINCFG_INEN | PORT_PINCFG_DRVSTR);
-// Set pin to output mode
- PORT->Group[0].DIRSET.reg = 1<<DOTSTAR_GPIO_CLK_BIT;
-#else
-  *(unsigned int*)PORTDIRSET |= (1 << DOTSTAR_GPIO_CLK_BIT); //seems OK without pinMode
-  *(unsigned int*)PORTDIRSET |= (1 << DOTSTAR_GPIO_DAT_BIT); //ditto
-#endif
-  dotstar_clk_lo();
-  dotstar_dat_hi();
 }
 
 /*
@@ -77,7 +64,7 @@ void dotstar_init(void)
 #define SPI_SCLK_LOW_TIME 1  /*1us works on arduino test code*/
 #define SPI_SCLK_HIGH_TIME 1
 
-uint8_t dotstar_transfer_byte(uint8_t byte_out)
+static uint8_t dotstar_transfer_byte(uint8_t byte_out)
 {
     uint8_t byte_in = 0;
     uint8_t bit;
@@ -109,8 +96,7 @@ uint8_t dotstar_transfer_byte(uint8_t byte_out)
     return byte_in;
 }
 
-
-void dotstar_show(int idx)
+static void dotstar_bitbang(int idx)
 {                             /*R    G    B */
  const unsigned char spectrum[8][3]={{0x00,0x00,0x00}, //black
 			      {0x00,0x00,0x7f}, //blue
@@ -137,19 +123,49 @@ void dotstar_show(int idx)
 
 }
 
-void dotstar_show_yellow(void)
-{
-//start frame
- (void)dotstar_transfer_byte(0x00);
- (void)dotstar_transfer_byte(0x00);
- (void)dotstar_transfer_byte(0x00);
- (void)dotstar_transfer_byte(0x00);
-//pixel
- (void)dotstar_transfer_byte(0xFF);
- (void)dotstar_transfer_byte(0x00); //Blue confirmed 
- (void)dotstar_transfer_byte(0x40); //Green by elimination
- (void)dotstar_transfer_byte(0x40); //Red confirmed
-//end frame
- (void)dotstar_transfer_byte(0xFF);
 
+static void dotstar_task(int dummy)
+{
+   int client, colour;
+   message m;
+
+#if 1
+// enable input, to support reading back values, with pullups disabled
+ PORT->Group[0].PINCFG[DOTSTAR_GPIO_DAT_BIT].reg = (uint8_t) (PORT_PINCFG_INEN | PORT_PINCFG_DRVSTR);
+// Set pin to output mode
+ PORT->Group[0].DIRSET.reg = 1<<DOTSTAR_GPIO_DAT_BIT;
+// enable input, to support reading back values, with pullups disabled
+ PORT->Group[0].PINCFG[DOTSTAR_GPIO_CLK_BIT].reg = (uint8_t) (PORT_PINCFG_INEN | PORT_PINCFG_DRVSTR);
+// Set pin to output mode
+ PORT->Group[0].DIRSET.reg = 1<<DOTSTAR_GPIO_CLK_BIT;
+#else
+  *(unsigned int*)PORTDIRSET |= (1 << DOTSTAR_GPIO_CLK_BIT); //seems OK without pinMode
+  *(unsigned int*)PORTDIRSET |= (1 << DOTSTAR_GPIO_DAT_BIT); //ditto
+#endif
+  dotstar_clk_lo();
+  dotstar_dat_hi();
+  while (1) {
+        /* Wait for a request */
+        receive(REQUEST, &m);
+        client = m.sender;
+        colour = m.int1;
+        if ((colour >= 0) && (colour <= 7))
+	{
+	    dotstar_bitbang(colour);
+	}
+   }
 }
+
+void dotstar_show(int colour)
+{
+    message m;
+    m.int1 = colour;
+    send(DOTSTAR_TASK, REQUEST, &m);
+}
+
+
+void dotstar_init(void)
+{
+   DOTSTAR_TASK = start("DOTSTAR", dotstar_task, 0, STACK);
+}
+
