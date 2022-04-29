@@ -3,6 +3,7 @@
 
 //njh TODO radical changes to hardware.h needed
 #include "hardware.h"
+#include "delay.h" //for inline delayMicroseconds()
 
 //arduino-startup.c housed SystemInit()   was hoping to leave intact for copyright simplicity
 /*
@@ -947,6 +948,8 @@ uart_handler(). */
 /* delay_loop -- timed delay */
 void delay_loop(unsigned usecs)
 {
+#if defined(__SAMD51__)
+//TODO
 /*quick and dirty adjust from 16MHz to 48MHz*/
     unsigned t = usecs << 2;
     while (t > 0) {
@@ -966,6 +969,9 @@ void delay_loop(unsigned usecs)
         nop(); nop(); nop();
         t--;
     }
+#else
+    delayMicroseconds(usecs);
+#endif
 }
 
 /* spin -- show Seven Stars of Death */
