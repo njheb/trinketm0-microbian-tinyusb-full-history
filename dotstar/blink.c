@@ -93,11 +93,15 @@ void test_taskA(int arg)
 {
 //   int client;
    message m;
-
+   int i=0;
    while (1) {
 	receive(PINGPONG, &m);
 //        client = m.sender;
-        dotstar_show(); //called from here get white pixel
+        int idx=i/2;
+        i++;
+        if (idx>6) i=0;
+
+        dotstar_show(idx); //called from here get white pixel
         Uart_write('X');
 	/* Clear LED output pin*/
 #ifdef WITHOUT_SAM_H
@@ -115,7 +119,7 @@ void test_taskB(int arg)
    while (1) {
 	receive(PINGPONG, &m);
 //        client = m.sender;
-
+//        dotstar_show_yellow();
         Uart_write('Y');
 		/* Set LED output pin*/
 #ifdef WITHOUT_SAM_H
@@ -152,8 +156,8 @@ void init() {
 	timer_init();
         dotstar_init();
 //        delayMicroseconds(5);
-        dotstar_show();
-//        dotstar_show();
+        //dotstar_show();
+        dotstar_show_yellow();
 
         //dotstar_show(); //using 2uS period for first go, calculates as 0
         //arduino_init(); called from __reset() now

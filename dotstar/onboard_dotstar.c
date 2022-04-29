@@ -110,7 +110,34 @@ uint8_t dotstar_transfer_byte(uint8_t byte_out)
 }
 
 
-void dotstar_show(void)
+void dotstar_show(int idx)
+{                             /*R    G    B */
+ const unsigned char spectrum[8][3]={{0x00,0x00,0x00}, //black
+			      {0x00,0x00,0x7f}, //blue
+			      {0x00,0x3f,0x3f}, //cyan
+			      {0x00,0x7f,0x00}, //green
+			      {0x3f,0x3f,0x00}, //yellow
+			      {0x7f,0x00,0x00}, //red
+			      {0x3f,0x00,0x3f}, //magenta
+			      {0x2a,0x2a,0x2a}, //white
+			      };
+
+//start frame
+ (void)dotstar_transfer_byte(0x00);
+ (void)dotstar_transfer_byte(0x00);
+ (void)dotstar_transfer_byte(0x00);
+ (void)dotstar_transfer_byte(0x00);
+//pixel
+ (void)dotstar_transfer_byte(0xFF);
+ (void)dotstar_transfer_byte(spectrum[idx][2]); //Blue confirmed 
+ (void)dotstar_transfer_byte(spectrum[idx][1]); //Green by elimination
+ (void)dotstar_transfer_byte(spectrum[idx][0]); //Red confirmed
+//end frame
+ (void)dotstar_transfer_byte(0xFF);
+
+}
+
+void dotstar_show_yellow(void)
 {
 //start frame
  (void)dotstar_transfer_byte(0x00);
@@ -119,9 +146,9 @@ void dotstar_show(void)
  (void)dotstar_transfer_byte(0x00);
 //pixel
  (void)dotstar_transfer_byte(0xFF);
- (void)dotstar_transfer_byte(0x40); //Blue confirmed 
- (void)dotstar_transfer_byte(0x00); //Green by elimination
- (void)dotstar_transfer_byte(0x00); //Red confirmed
+ (void)dotstar_transfer_byte(0x00); //Blue confirmed 
+ (void)dotstar_transfer_byte(0x40); //Green by elimination
+ (void)dotstar_transfer_byte(0x40); //Red confirmed
 //end frame
  (void)dotstar_transfer_byte(0xFF);
 
