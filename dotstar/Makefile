@@ -47,7 +47,7 @@ vpath %.h ../microbian
 %.o: %.s
 	$(AS) $(CPU) $< -o $@
 
-APP = blink.o onboard_dotstar.o force_bootloader.o
+APP = blink.o force_bootloader.o
 
 WORKAROUND = ../microbian/startup.o ../microbian/microbian.a
 

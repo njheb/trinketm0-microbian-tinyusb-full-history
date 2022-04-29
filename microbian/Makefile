@@ -25,7 +25,7 @@ INCLUDE = -I ~/.arduino15/packages/adafruit/tools/CMSIS-Atmel/1.2.2/CMSIS/Device
 
 
 #DRIVERS = timer.o serial.o i2c.o radio.o display.o
-DRIVERS = timer.o serial.o
+DRIVERS = timer.o serial.o onboard_dotstar.o
 
 #BODGE = cortex_handlers.o delay.o temp-wiring.o arduino-startup.o polling-uart.o
 #moved code from temp-wiring.c and arduino-startup.c into startup.c

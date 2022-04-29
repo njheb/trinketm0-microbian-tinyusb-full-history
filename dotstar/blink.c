@@ -74,8 +74,8 @@ See ~/Arduino/libraries/Adafruit_BusIO/Adafruit_SPIDevice.*
 #define PORTOUT 0x41004410
 #define PORTCLR 0x41004414
 #define LED_GPIO_BIT PIN_REAL_LED
-#define DOTSTAR_GPIO_CLK_BIT 1
-#define DOTSTAR_GPIO_DAT_BIT 0
+//#define DOTSTAR_GPIO_CLK_BIT PIN_REAL_DOTSTAR_CLK
+//#define DOTSTAR_GPIO_DAT_BIT PIN_REAL_DOTSTAR_DAT
 #endif
 
 static int A_TASK;

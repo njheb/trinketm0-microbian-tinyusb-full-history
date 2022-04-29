@@ -22,8 +22,11 @@ static int DOTSTAR_TASK;  /* PID of driver process*/
 //reverse DOTSTAR bits for itsybitsym0
 #endif
 
-#define DOTSTAR_GPIO_CLK_BIT 1
-#define DOTSTAR_GPIO_DAT_BIT 0
+//#define DOTSTAR_GPIO_CLK_BIT 1
+//#define DOTSTAR_GPIO_DAT_BIT 0
+#define DOTSTAR_GPIO_CLK_BIT PIN_REAL_DOTSTAR_CLK
+#define DOTSTAR_GPIO_DAT_BIT PIN_REAL_DOTSTAR_DAT
+
 
 /*NB looks like need to checkout working of digitalWrite()*/
 
