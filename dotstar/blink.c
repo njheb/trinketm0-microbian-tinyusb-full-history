@@ -56,10 +56,11 @@ See ~/Arduino/libraries/Adafruit_BusIO/Adafruit_SPIDevice.*
 
 */
 
-#define WITHOUT_SAM_H
+//#define WITHOUT_SAM_H
 #ifndef WITHOUT_SAM_H
 #include "sam.h"
 #endif
+#include "delay.h"
 #include "mcu_pins.h"
 #include "microbian.h"
 //#include "./microbian/microbian.h"
@@ -96,7 +97,7 @@ void test_taskA(int arg)
    while (1) {
 	receive(PINGPONG, &m);
 //        client = m.sender;
-        dotstar_show();
+        dotstar_show(); //called from here get white pixel
         Uart_write('X');
 	/* Clear LED output pin*/
 #ifdef WITHOUT_SAM_H
@@ -150,6 +151,10 @@ void test_taskT(int arg)
 void init() {
 	timer_init();
         dotstar_init();
+//        delayMicroseconds(5);
+        dotstar_show();
+//        dotstar_show();
+
         //dotstar_show(); //using 2uS period for first go, calculates as 0
         //arduino_init(); called from __reset() now
 

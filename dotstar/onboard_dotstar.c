@@ -3,8 +3,9 @@
 https://en.wikipedia.org/wiki/Serial_Peripheral_Interface#Clock_polarity_and_phase
 */
 //typedef char uint8_t;
+#include "sam.h"
 #include "delay.h"
-#define WITHOUT_SAM_H
+//#define WITHOUT_SAM_H
 #include "mcu_pins.h"
 
 #ifdef WITHOUT_SAM_H
@@ -13,34 +14,52 @@ https://en.wikipedia.org/wiki/Serial_Peripheral_Interface#Clock_polarity_and_pha
 #define PORTOUT 0x41004410
 #define PORTCLR 0x41004414
 #define LED_GPIO_BIT PIN_REAL_LED
+//reverse DOTSTAR bits for itsybitsym0
+#endif
 #define DOTSTAR_GPIO_CLK_BIT 1
 #define DOTSTAR_GPIO_DAT_BIT 0
-#endif
+
+/*NB looks like need to checkout working of digitalWrite()*/
 
 void dotstar_clk_hi(void)
 {
-   *(unsigned int*)PORTOUT = (1 << DOTSTAR_GPIO_CLK_BIT);
+//   *(unsigned int*)PORTOUT = (1 << DOTSTAR_GPIO_CLK_BIT);
+     PORT->Group[0].OUTSET.reg = (1 << DOTSTAR_GPIO_CLK_BIT);
 }
 
 void dotstar_clk_lo(void)
 {
-   *(unsigned int*)PORTCLR = (1 << DOTSTAR_GPIO_CLK_BIT);
+//   *(unsigned int*)PORTCLR = (1 << DOTSTAR_GPIO_CLK_BIT);
+     PORT->Group[0].OUTCLR.reg = (1 << DOTSTAR_GPIO_CLK_BIT); 
 }
 
 void dotstar_dat_hi(void)
 {
-   *(unsigned int*)PORTOUT = (1 << DOTSTAR_GPIO_DAT_BIT);
+//   *(unsigned int*)PORTOUT = (1 << DOTSTAR_GPIO_DAT_BIT);
+     PORT->Group[0].OUTSET.reg =  (1 << DOTSTAR_GPIO_DAT_BIT);
 }
 
 void dotstar_dat_lo(void)
 {
-   *(unsigned int*)PORTCLR = (1 << DOTSTAR_GPIO_DAT_BIT);
+//   *(unsigned int*)PORTCLR = (1 << DOTSTAR_GPIO_DAT_BIT);
+   PORT->Group[0].OUTCLR.reg = (1 << DOTSTAR_GPIO_DAT_BIT);
 }
 
 void dotstar_init(void)
 {
-  *(unsigned int*)PORTDIRSET |= (1 << DOTSTAR_GPIO_CLK_BIT);
-  *(unsigned int*)PORTDIRSET |= (1 << DOTSTAR_GPIO_DAT_BIT);
+#if 1
+// enable input, to support reading back values, with pullups disabled
+ PORT->Group[0].PINCFG[DOTSTAR_GPIO_DAT_BIT].reg = (uint8_t) (PORT_PINCFG_INEN | PORT_PINCFG_DRVSTR);
+// Set pin to output mode
+ PORT->Group[0].DIRSET.reg = 1<<DOTSTAR_GPIO_DAT_BIT;
+// enable input, to support reading back values, with pullups disabled
+ PORT->Group[0].PINCFG[DOTSTAR_GPIO_CLK_BIT].reg = (uint8_t) (PORT_PINCFG_INEN | PORT_PINCFG_DRVSTR);
+// Set pin to output mode
+ PORT->Group[0].DIRSET.reg = 1<<DOTSTAR_GPIO_CLK_BIT;
+#else
+  *(unsigned int*)PORTDIRSET |= (1 << DOTSTAR_GPIO_CLK_BIT); //seems OK without pinMode
+  *(unsigned int*)PORTDIRSET |= (1 << DOTSTAR_GPIO_DAT_BIT); //ditto
+#endif
   dotstar_clk_lo();
   dotstar_dat_hi();
 }
@@ -55,7 +74,7 @@ void dotstar_init(void)
  * Returns the received byte.
  */
 //uint8_t bitdelay_us = (1000000/ 8000000) / 2; computes to zero
-#define SPI_SCLK_LOW_TIME 1
+#define SPI_SCLK_LOW_TIME 1  /*1us works on arduino test code*/
 #define SPI_SCLK_HIGH_TIME 1
 
 uint8_t dotstar_transfer_byte(uint8_t byte_out)
@@ -100,15 +119,10 @@ void dotstar_show(void)
  (void)dotstar_transfer_byte(0x00);
 //pixel
  (void)dotstar_transfer_byte(0xFF);
- (void)dotstar_transfer_byte(0xFF); //B guess order
- (void)dotstar_transfer_byte(0x00); //G
- (void)dotstar_transfer_byte(0x00); //R
+ (void)dotstar_transfer_byte(0x40); //Blue confirmed 
+ (void)dotstar_transfer_byte(0x00); //Green by elimination
+ (void)dotstar_transfer_byte(0x00); //Red confirmed
 //end frame
  (void)dotstar_transfer_byte(0xFF);
-#if 1
- (void)dotstar_transfer_byte(0xFF);
- (void)dotstar_transfer_byte(0xFF);
- (void)dotstar_transfer_byte(0xFF);
-#endif
 
 }
