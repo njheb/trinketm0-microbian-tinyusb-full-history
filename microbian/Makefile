@@ -3,7 +3,7 @@
 
 all: microbian.a startup.o
 
-CPU = -mcpu=cortex-m0 -mthumb
+CPU = -mcpu=cortex-m0plus -mthumb
 #CFLAGS = -O -g -Wall -ffreestanding
 CFLAGS = -Wall -g -nostartfiles -O -DF_CPU=48000000UL -ffreestanding \
 -D__SAMD21E18A__ -DCRYSTALLESS -DADAFRUIT_TRINKET_M0 -DARDUINO_SAMD_ZERO -DARM_MATH_CM0PLUS

@@ -7,8 +7,6 @@
 #define PIN_REAL_DOTSTAR_CLK 1
 #endif
 
-//itsybitsy find define
-//itsybitsy find define
 #if defined( ADAFRUIT_ITSYBITSY_M0 )
 #define PIN_REAL_LED 17
 #define PIN_REAL_RX 11

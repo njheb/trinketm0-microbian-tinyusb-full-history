@@ -79,6 +79,9 @@ clean:
 	rm -f *.bin *.elf *.nm *.map *.o *elf.asm *.hexdump #2> /dev/null
 
 
+ultraclean: clean
+	rm -f ../microbian/*.a ../microbian/*.o
+
 flash: kernel.bin
 	${BOSSAC} -i -d --port=${PORT} -i -e -w -v kernel.bin -R --offset 0x2000
 
