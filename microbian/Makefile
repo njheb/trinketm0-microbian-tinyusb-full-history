@@ -18,10 +18,12 @@ AR = arm-none-eabi-ar
 #          -I ~/.arduino15/packages/adafruit/tools/CMSIS-Atmel/1.2.2/CMSIS/Device/ATMEL/samd21 \
 #          -I ~/.arduino15/packages/adafruit/tools/CMSIS/5.4.0/CMSIS/Core/Include \
 #          -I ./variant-trinketm0
+
+VARIANT_PATH = ../variant-trinketm0
 INCLUDE = -I ~/.arduino15/packages/adafruit/tools/CMSIS-Atmel/1.2.2/CMSIS/Device/ATMEL \
           -I ~/.arduino15/packages/adafruit/tools/CMSIS-Atmel/1.2.2/CMSIS/Device/ATMEL/samd21 \
           -I ~/.arduino15/packages/adafruit/tools/CMSIS/5.4.0/CMSIS/Core/Include \
-          -I ../variant-trinketm0
+          -I $(VARIANT_PATH)
 
 
 #DRIVERS = timer.o serial.o i2c.o radio.o display.o
