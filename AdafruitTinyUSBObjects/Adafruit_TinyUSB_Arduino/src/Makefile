@@ -6,7 +6,12 @@ CFLAGS= -Wall -g -nostartfiles -O -DF_CPU=48000000UL -ffreestanding \
 -DUSBCON -DUSB_CONFIG_POWER=100 "-DUSB_MANUFACTURER=\"Adafruit\"" "-DUSB_PRODUCT=\"Trinket M0\"" \
 -DUSE_TINYUSB -DARDUINO_ARCH_SAMD
 
-INCLUDE = . ./common ./arduino ./common ./device
+INCLUDE = -I . -I ./common -I ./arduino -I ./common -I ./device -I ./fromcore \
+	-I ~/.arduino15/packages/adafruit/tools/CMSIS-Atmel/1.2.2/CMSIS/Device/ATMEL \
+        -I ~/.arduino15/packages/adafruit/tools/CMSIS-Atmel/1.2.2/CMSIS/Device/ATMEL/samd21 \
+        -I ~/.arduino15/packages/adafruit/tools/CMSIS/5.4.0/CMSIS/Core/Include \
+        -I ../../../variant-trinketm0
+
 
 
 AR = arm-none-eabi-ar
@@ -43,5 +48,14 @@ tinyusb.a: $(OBJECTS)
 	$(AR) cr $@ $^
 
 %.o: %.cpp
+	$(CC) $(CPU) $(CFLAGS) $(INCLUDE) -c $< -o $@
+
+%.cpp.o: %.cpp
+	$(CC) $(CPU) $(CFLAGS) $(INCLUDE) -c $< -o $@
+
+%.c.o: %.c
+	$(CC) $(CPU) $(CFLAGS) $(INCLUDE) -c $< -o $@
+
+%.o: %.c
 	$(CC) $(CPU) $(CFLAGS) $(INCLUDE) -c $< -o $@
 

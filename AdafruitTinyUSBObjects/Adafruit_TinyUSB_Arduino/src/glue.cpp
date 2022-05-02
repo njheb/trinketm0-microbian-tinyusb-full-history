@@ -2,7 +2,8 @@
 
 Adafruit_USBD_CDC Serial;
 
-extern "C"{
+extern "C" {
+
 void USBSerial_begin(int baud)
 {
 	Serial.begin(baud);
@@ -16,6 +17,10 @@ void USBSerial_write(int c)
 
 int USBSerial_read(void)
 {
+int n=-1;
 	if (Serial)
-		return Serial.read();
+		n = Serial.read();
+	return n;
+}
+
 }
