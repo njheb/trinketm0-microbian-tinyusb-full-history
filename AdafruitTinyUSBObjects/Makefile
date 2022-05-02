@@ -1,3 +1,14 @@
+CC = arm-none-eabi-gcc
+CPU = -mcpu=cortex-m0plus -mthumb
+
+CFLAGS= -Wall -g -nostartfiles -O -DF_CPU=48000000UL -ffreestanding \
+-D__SAMD21E18A__ -DCRYSTALLESS -DADAFRUIT_TRINKET_M0 -DARDUINO_SAMD_ZERO -DARM_MATH_CM0PLUS -DUSB_VID=0x239A -DUSB_PID=0x801e \
+-DUSBCON -DUSB_CONFIG_POWER=100 "-DUSB_MANUFACTURER=\"Adafruit\"" "-DUSB_PRODUCT=\"Trinket M0\"" \
+-DUSE_TINYUSB -DARDUINO_ARCH_SAMD
+
+INCLUDE = . ./common ./arduino ./common ./device
+
+
 AR = arm-none-eabi-ar
 
 OBJECTS = ./class/cdc/cdc_device.c.o \
@@ -24,8 +35,13 @@ OBJECTS = ./class/cdc/cdc_device.c.o \
 	./arduino/msc/Adafruit_USBD_MSC.cpp.o \
 	./arduino/midi/Adafruit_USBD_MIDI.cpp.o \
 	./arduino/ports/samd/Adafruit_TinyUSB_samd.cpp.o \
-	./arduino/Adafruit_TinyUSB_API.cpp.o
+	./arduino/Adafruit_TinyUSB_API.cpp.o \
+        glue.o
 
 tinyusb.a: $(OBJECTS)
 	rm -f tinyusb.a
 	$(AR) cr $@ $^
+
+%.o: %.cpp
+	$(CC) $(CPU) $(CFLAGS) $(INCLUDE) -c $< -o $@
+
