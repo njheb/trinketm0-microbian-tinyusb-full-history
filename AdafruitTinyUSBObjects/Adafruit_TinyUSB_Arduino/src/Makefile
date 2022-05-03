@@ -48,6 +48,8 @@ OBJECTS = ./class/cdc/cdc_device.c.o \
 	./arduino/midi/Adafruit_USBD_MIDI.cpp.o \
 	./arduino/ports/samd/Adafruit_TinyUSB_samd.cpp.o \
 	./arduino/Adafruit_TinyUSB_API.cpp.o \
+	./fromcore/Print.cpp.o \
+	./fromcore/Stream.cpp.o \
         glue.o
 
 tinyusb.a: $(OBJECTS)
