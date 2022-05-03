@@ -78,13 +78,20 @@ See ~/Arduino/libraries/Adafruit_BusIO/Adafruit_SPIDevice.*
 //#define DOTSTAR_GPIO_DAT_BIT PIN_REAL_DOTSTAR_DAT
 #endif
 
+static int USB_TASK;
+#define USBPUTC 334
+#define USBGETC 335
+void USBSerial_putc(char ch);
+int USBSerial_getc(void);
+
+
 static int A_TASK;
 static int B_TASK;
 #define PINGPONG 333
 
 
 extern void force_bootloader(void);
-int count = 100*5*10;
+int count = 200*4;
 #ifndef WITHOUT_SAM_H
 uint32_t port = 0;
 const uint32_t pin = PIN_REAL_LED;
@@ -92,6 +99,7 @@ const uint32_t pinMask = (1ul << pin);
 #endif
 
 volatile int c;
+//volatile char c;
 
 void test_taskA(int arg)
 {
@@ -107,8 +115,8 @@ void test_taskA(int arg)
 
         dotstar_show(idx); //called from here get white pixel
         Uart_write('X');
-        c = USBSerial_read();
-	USBSerial_write('U');
+        c = USBSerial_getc();
+	USBSerial_putc('U');
 	/* Clear LED output pin*/
 #ifdef WITHOUT_SAM_H
 	*(unsigned int*)PORTCLR = (1 << LED_GPIO_BIT);
@@ -129,10 +137,10 @@ void test_taskB(int arg)
         dotstar_show(DOT_BLACK);
         Uart_write('Y');
         if (c==-1)
-		USBSerial_write('.');
+		USBSerial_putc('.');
 	else
-		USBSerial_write(c);
-		
+		USBSerial_putc(c);
+
 
 		/* Set LED output pin*/
 #ifdef WITHOUT_SAM_H
@@ -147,7 +155,7 @@ void test_taskB(int arg)
 void test_taskT(int arg)
 {
    message m;
-   timer_pulse(100); //pulse 50 worked for ttyACM0, 100 also
+   timer_pulse(250); //pulse 50 worked for ttyACM0, 100 also
    while (1) {
 	receive(PING, NULL);
         count--;
@@ -157,15 +165,76 @@ void test_taskT(int arg)
            Uart_end();
            force_bootloader();
         }
-        if ((count & 0x7) == 0x0)
+        if ((count & 0x3) == 0x0)
             send(A_TASK, PINGPONG, &m);
-        else if ((count & 0x7) == 0x4)
+        else if ((count & 0x3) == 0x2)
             send(B_TASK, PINGPONG, &m);
 
-	TinyUSB_Device_Task();
-	TinyUSB_Device_FlushCDC();
    }
 }
+
+void test_taskUSB(int arg)
+{
+   message m;
+   int client;
+   int reader = -1;
+   char ch;
+
+extern void __libc_init_array(void);
+
+   __libc_init_array();
+   TinyUSB_Device_Init(0);
+   delayMicroseconds(1000);
+
+   USBSerial_begin(115200);
+
+   timer_pulse(100); //pulse 50 worked for ttyACM0, 100 also
+   while (1) {
+	receive(ANY, &m);
+	client = m.sender;
+//m.int1;
+	switch (m.type) {
+	case PING:
+	   TinyUSB_Device_Task();
+	   TinyUSB_Device_FlushCDC();
+	   break;
+	case USBGETC:
+//	   if (reader >= 0)
+//		panic("Two clients cannot wait for input at once");
+	   reader = client;
+	   m.int1 = USBSerial_read(); //will return -1 if none available
+	   send(reader, REPLY, &m);
+	   reader = -1;
+	   break;
+	case USBPUTC:
+            ch = m.int1;
+            if (ch == '\n') USBSerial_write('\r');
+            USBSerial_write(ch);
+	   break;
+	default:
+	   badmesg(m.type);
+	}
+   }
+
+}
+
+/* serial_putc -- queue a character for output */
+void USBSerial_putc(char ch)
+{
+    message m;
+    m.int1 = ch;
+    send(USB_TASK, USBPUTC, &m);
+}
+
+/* serial_getc -- request an input character */
+int USBSerial_getc(void)
+{
+    message m;
+    send(USB_TASK, USBGETC, NULL);
+    receive(REPLY, &m);
+    return m.int1;
+}
+
 
 //see WVariant.h EPortType port = PORTA;
 void init() {
@@ -178,14 +247,8 @@ void init() {
         //dotstar_show(); //using 2uS period for first go, calculates as 0
         //arduino_init(); called from __reset() now
 
-extern void __libc_init_array(void);
 
-   __libc_init_array();
-   TinyUSB_Device_Init(0);
-   delayMicroseconds(1000);
-        
         Uart_begin(9600);
-	USBSerial_begin(115200);
 	/* Set output direction for LED pin*/
 #ifdef WITHOUT_SAM_H
 	* (unsigned int*)PORTDIRSET |= (1 << LED_GPIO_BIT);
@@ -199,4 +262,5 @@ extern void __libc_init_array(void);
   B_TASK = start("TestB", test_taskB, 0, STACK);
 
            start("TestTimer", test_taskT, 0, STACK);
+  USB_TASK = start("USBCDC", test_taskUSB, 0, STACK);
 }

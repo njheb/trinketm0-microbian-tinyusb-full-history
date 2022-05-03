@@ -47,3 +47,17 @@ portable/nordic/nrf5x/dcd_nrf5x.c:      // osal_yield();
 
 So look at arduino/Adafruit_USBD_CDC.cpp and
 	   fromcore/Stream.cpp
+
+remember reset via 1200 baud touch is disabled currently, 
+by single line comment out
+
+As tinyusbCDC is very messy right now implement on
+
+PUTC, GETC only for now
+
+TIMER PULSE 100ms to run tud and cdc
+let buffering be handled by tinyusb  
+
+may need to address calling of yield which in tinyusb terms means run the 
+tud and cdc stack state m/c for one cycle.
+
