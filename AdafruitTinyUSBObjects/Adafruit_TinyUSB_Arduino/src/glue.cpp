@@ -1,6 +1,7 @@
 #include "Adafruit_TinyUSB.h"
 
-Adafruit_USBD_CDC Serial;
+
+extern Adafruit_USBD_CDC Serial;
 
 extern "C" {
 

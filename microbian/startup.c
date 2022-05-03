@@ -1619,11 +1619,20 @@ void USB_3_Handler(void)
 	usb_isr();
 }
 #else
+#if !defined(USE_TINYUSB)
 void USB_Handler(void)
 {
   if (usb_isr)
     usb_isr();
 }
+#else
+//void USB_Handler(void)
+//{
+//extern void tud_int_handler(int);
+//  tud_int_handler(0);
+//}
+#endif
+
 #endif
 
 void USB_SetHandler(void (*new_usb_isr)(void))

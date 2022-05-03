@@ -49,7 +49,7 @@ void USB_3_Handler(void) { tud_int_handler(0); }
 
 // SAMD21
 void USB_Handler(void) { tud_int_handler(0); }
-
+//extern void tud_int_handler(int);
 #endif
 
 } // extern C
