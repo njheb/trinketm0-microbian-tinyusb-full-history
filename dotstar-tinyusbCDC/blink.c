@@ -84,12 +84,14 @@ static int B_TASK;
 
 
 extern void force_bootloader(void);
-int count = 100*5;
+int count = 100*5*10;
 #ifndef WITHOUT_SAM_H
 uint32_t port = 0;
 const uint32_t pin = PIN_REAL_LED;
 const uint32_t pinMask = (1ul << pin);
 #endif
+
+volatile int c;
 
 void test_taskA(int arg)
 {
@@ -105,6 +107,7 @@ void test_taskA(int arg)
 
         dotstar_show(idx); //called from here get white pixel
         Uart_write('X');
+        c = USBSerial_read();
 	USBSerial_write('U');
 	/* Clear LED output pin*/
 #ifdef WITHOUT_SAM_H
@@ -125,6 +128,12 @@ void test_taskB(int arg)
         //dotstar_show(DOT_BLACK);
         dotstar_show(DOT_BLACK);
         Uart_write('Y');
+        if (c==-1)
+		USBSerial_write('.');
+	else
+		USBSerial_write(c);
+		
+
 		/* Set LED output pin*/
 #ifdef WITHOUT_SAM_H
 	*(unsigned int*)PORTOUT = (1 << LED_GPIO_BIT);
@@ -138,7 +147,7 @@ void test_taskB(int arg)
 void test_taskT(int arg)
 {
    message m;
-   timer_pulse(50);
+   timer_pulse(100); //pulse 50 worked for ttyACM0, 100 also
    while (1) {
 	receive(PING, NULL);
         count--;
@@ -148,9 +157,9 @@ void test_taskT(int arg)
            Uart_end();
            force_bootloader();
         }
-        if (count & 0x1)
+        if ((count & 0x7) == 0x0)
             send(A_TASK, PINGPONG, &m);
-        else
+        else if ((count & 0x7) == 0x4)
             send(B_TASK, PINGPONG, &m);
 
 	TinyUSB_Device_Task();
