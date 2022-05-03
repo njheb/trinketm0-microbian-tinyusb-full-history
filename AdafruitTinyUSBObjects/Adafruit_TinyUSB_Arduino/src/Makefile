@@ -1,7 +1,14 @@
 CC = arm-none-eabi-gcc
 CPU = -mcpu=cortex-m0plus -mthumb
 
-CFLAGS= -Wall -g -nostartfiles -O -DF_CPU=48000000UL -ffreestanding \
+CPPFLAGS += -fno-exceptions -fno-rtti
+
+#CFLAGS= -Wall -g -nostartfiles -O -DF_CPU=48000000UL -ffreestanding \
+#-D__SAMD21E18A__ -DCRYSTALLESS -DADAFRUIT_TRINKET_M0 -DARDUINO_SAMD_ZERO -DARM_MATH_CM0PLUS -DUSB_VID=0x239A -DUSB_PID=0x801e \
+#-DUSBCON -DUSB_CONFIG_POWER=100 "-DUSB_MANUFACTURER=\"Adafruit\"" "-DUSB_PRODUCT=\"Trinket M0\"" \
+#-DUSE_TINYUSB -DARDUINO_ARCH_SAMD
+
+CFLAGS= -Wall -g -nostartfiles -O -DF_CPU=48000000UL -ffreestanding  \
 -D__SAMD21E18A__ -DCRYSTALLESS -DADAFRUIT_TRINKET_M0 -DARDUINO_SAMD_ZERO -DARM_MATH_CM0PLUS -DUSB_VID=0x239A -DUSB_PID=0x801e \
 -DUSBCON -DUSB_CONFIG_POWER=100 "-DUSB_MANUFACTURER=\"Adafruit\"" "-DUSB_PRODUCT=\"Trinket M0\"" \
 -DUSE_TINYUSB -DARDUINO_ARCH_SAMD
@@ -48,7 +55,7 @@ tinyusb.a: $(OBJECTS)
 	$(AR) cr $@ $^
 
 %.o: %.cpp
-	$(CC) $(CPU) $(CFLAGS) $(INCLUDE) -c $< -o $@
+	$(CC) $(CPU) $(CFLAGS) $(CPPFLAGS) $(INCLUDE) -c $< -o $@
 
 %.cpp.o: %.cpp
 	$(CC) $(CPU) $(CFLAGS) $(INCLUDE) -c $< -o $@
@@ -59,3 +66,5 @@ tinyusb.a: $(OBJECTS)
 %.o: %.c
 	$(CC) $(CPU) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
+clean: $(OBJECTS)
+	rm -f $(OBJECTS)

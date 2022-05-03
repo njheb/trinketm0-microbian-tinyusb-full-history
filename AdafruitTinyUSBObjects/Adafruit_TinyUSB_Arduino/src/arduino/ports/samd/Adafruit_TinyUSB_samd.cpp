@@ -135,7 +135,8 @@ void TinyUSB_Port_InitDevice(uint8_t rhport) {
 
 void TinyUSB_Port_EnterDFU(void) {
   // Reset to bootloader
-  initiateReset(250);
+//TODO disabled for now while hacking horrible bodge together for CDC in microbian
+//  initiateReset(250);
 }
 
 uint8_t TinyUSB_Port_GetSerialNumber(uint8_t serial_id[16]) {
