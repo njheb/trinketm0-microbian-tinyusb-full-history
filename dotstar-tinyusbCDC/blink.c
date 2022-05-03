@@ -115,8 +115,8 @@ void test_taskA(int arg)
 
         dotstar_show(idx); //called from here get white pixel
         Uart_write('X');
-        c = USBSerial_getc();
-	USBSerial_putc('U');
+//        c = USBSerial_getc();
+//	USBSerial_putc('U');
 	/* Clear LED output pin*/
 #ifdef WITHOUT_SAM_H
 	*(unsigned int*)PORTCLR = (1 << LED_GPIO_BIT);
@@ -136,10 +136,10 @@ void test_taskB(int arg)
         //dotstar_show(DOT_BLACK);
         dotstar_show(DOT_BLACK);
         Uart_write('Y');
-        if (c==-1)
-		USBSerial_putc('.');
-	else
-		USBSerial_putc(c);
+//        if (c==-1)
+//		USBSerial_putc('.');
+//	else
+//		USBSerial_putc(c);
 
 
 		/* Set LED output pin*/
@@ -218,6 +218,31 @@ extern void __libc_init_array(void);
 
 }
 
+void echo_task(int arg)
+{
+(void)arg;
+
+	while (1) {
+	   timer_delay(100);
+           c = USBSerial_getc();
+//	   USBSerial_putc('U');
+           if (c==-1)
+	   {
+		USBSerial_putc('.');
+	   	USBSerial_putc('\r');
+	   }
+	   else
+	   {
+		if (c == '\r')
+		   USBSerial_putc('\n');
+		else
+		   USBSerial_putc(c);
+
+	   }
+	}
+
+}
+
 /* serial_putc -- queue a character for output */
 void USBSerial_putc(char ch)
 {
@@ -263,4 +288,6 @@ void init() {
 
            start("TestTimer", test_taskT, 0, STACK);
   USB_TASK = start("USBCDC", test_taskUSB, 0, STACK);
+  	start("echo", echo_task, 0, 256);
+
 }
