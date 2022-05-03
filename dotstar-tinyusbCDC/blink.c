@@ -169,7 +169,9 @@ void init() {
         //dotstar_show(); //using 2uS period for first go, calculates as 0
         //arduino_init(); called from __reset() now
 
-//   __libc_init_array();
+extern void __libc_init_array(void);
+
+   __libc_init_array();
    TinyUSB_Device_Init(0);
    delayMicroseconds(1000);
         
