@@ -1,0 +1,49 @@
+nick@Inspiron-530:~/.arduino15/packages/adafruit/hardware/samd/1.7.10/cores/arduino$ grep TinyUSB_ *
+grep: avr: Is a directory
+delay.c:  TinyUSB_Device_Task();
+delay.c:  TinyUSB_Device_FlushCDC();
+main.cpp:  TinyUSB_Device_Init(0);
+
+arduino/Adafruit_TinyUSB_API.cpp: for the above 3 functions
+
+may need to call extern "C" __libc_init_array(); as using tinyusb stack
+
+
+delay(1);
+TinyUSB_Device_Init(0);
+
+
+//from delay.c
+//probably going to have to search and replace in Adafruit USB stack
+
+#if defined(USE_TINYUSB)
+
+// run TinyUSB background task when yield()
+void yield(void)
+{
+  TinyUSB_Device_Task();
+  TinyUSB_Device_FlushCDC();
+}
+
+#endif
+
+
+
+yield called from
+nick@Inspiron-530:~/Projects/trinket-microbian-tinyusb/AdafruitTinyUSBObjects/Adafruit_TinyUSB_Arduino/src$ grep -r "yield[(][)]" *
+arduino/webusb/Adafruit_USBD_WebUSB.cpp:    yield();
+arduino/webusb/Adafruit_USBD_WebUSB.cpp:    yield();
+arduino/webusb/Adafruit_USBD_WebUSB.cpp:      yield();
+arduino/Adafruit_USBD_CDC.cpp:    yield();
+arduino/Adafruit_USBD_CDC.cpp:    yield();
+arduino/Adafruit_USBD_CDC.cpp:      yield();
+fromcore/delay.c:    yield();
+fromcore/delay.c:// run TinyUSB background task when yield()
+fromcore/main.cpp:    yield(); // yield run usb background task
+fromcore/hooks.c: * Empty yield() hook.
+fromcore/Stream.cpp:    yield(); // running TinyUSB task
+fromcore/Stream.cpp:    yield(); // running TinyUSB task
+portable/nordic/nrf5x/dcd_nrf5x.c:      // osal_yield();
+
+So look at arduino/Adafruit_USBD_CDC.cpp and
+	   fromcore/Stream.cpp
