@@ -27,6 +27,9 @@
 
 #define PARSE_TIMEOUT 1000  // default number of milli-seconds to wait
 
+extern "C" void YIELD(void);
+#define yield() YIELD()
+
 // protected method to read stream with timeout
 int Stream::timedRead()
 {
@@ -319,3 +322,5 @@ int Stream::findMulti( struct Stream::MultiTarget *targets, int tCount) {
   // unreachable
   return -1;
 }
+#undef yield
+#define yield yield

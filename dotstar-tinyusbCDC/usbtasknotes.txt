@@ -28,21 +28,21 @@ void yield(void)
 #endif
 
 
-
+* suffix below yield() fixed up with YIELD()
 yield called from
 nick@Inspiron-530:~/Projects/trinket-microbian-tinyusb/AdafruitTinyUSBObjects/Adafruit_TinyUSB_Arduino/src$ grep -r "yield[(][)]" *
 arduino/webusb/Adafruit_USBD_WebUSB.cpp:    yield();
 arduino/webusb/Adafruit_USBD_WebUSB.cpp:    yield();
 arduino/webusb/Adafruit_USBD_WebUSB.cpp:      yield();
-arduino/Adafruit_USBD_CDC.cpp:    yield();
-arduino/Adafruit_USBD_CDC.cpp:    yield();
-arduino/Adafruit_USBD_CDC.cpp:      yield();
+*arduino/Adafruit_USBD_CDC.cpp:    yield();
+*arduino/Adafruit_USBD_CDC.cpp:    yield();
+*arduino/Adafruit_USBD_CDC.cpp:      yield();
 fromcore/delay.c:    yield();
 fromcore/delay.c:// run TinyUSB background task when yield()
 fromcore/main.cpp:    yield(); // yield run usb background task
 fromcore/hooks.c: * Empty yield() hook.
-fromcore/Stream.cpp:    yield(); // running TinyUSB task
-fromcore/Stream.cpp:    yield(); // running TinyUSB task
+*fromcore/Stream.cpp:    yield(); // running TinyUSB task
+*fromcore/Stream.cpp:    yield(); // running TinyUSB task
 portable/nordic/nrf5x/dcd_nrf5x.c:      // osal_yield();
 
 So look at arduino/Adafruit_USBD_CDC.cpp and

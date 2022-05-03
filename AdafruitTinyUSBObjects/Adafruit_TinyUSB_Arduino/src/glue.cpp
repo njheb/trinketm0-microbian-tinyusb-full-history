@@ -24,4 +24,10 @@ int n=-1;
 	return n;
 }
 
+void YIELD(void){
+  TinyUSB_Device_Task();
+  TinyUSB_Device_FlushCDC();
+}
+
+
 }

@@ -188,7 +188,7 @@ extern void __libc_init_array(void);
 
    USBSerial_begin(115200);
 
-   timer_pulse(100); //pulse 50 worked for ttyACM0, 100 also
+   timer_pulse(50); //pulse 50 worked for ttyACM0, 100 also
    while (1) {
 	receive(ANY, &m);
 	client = m.sender;
@@ -228,8 +228,8 @@ void echo_task(int arg)
 //	   USBSerial_putc('U');
            if (c==-1)
 	   {
-		USBSerial_putc('.');
-	   	USBSerial_putc('\r');
+//		USBSerial_putc('.');
+//	   	USBSerial_putc('\r');
 	   }
 	   else
 	   {

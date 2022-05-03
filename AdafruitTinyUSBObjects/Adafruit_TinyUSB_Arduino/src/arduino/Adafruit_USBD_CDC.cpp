@@ -37,6 +37,10 @@
 #define TINYUSB_API_VERSION 0
 #endif
 
+
+extern "C" void YIELD(void);
+#define yield() YIELD()
+
 // Starting endpoints; adjusted elsewhere as needed
 #define EPOUT 0x00
 #define EPIN 0x80
