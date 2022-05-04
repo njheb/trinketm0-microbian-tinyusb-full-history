@@ -197,14 +197,24 @@ extern void __libc_init_array(void);
 	case PING:
 	   TinyUSB_Device_Task();
 	   TinyUSB_Device_FlushCDC();
+	   if (reader != -1)
+	   {
+	      m.int1 = USBSerial_read();
+	      if (m.int1 != -1) {
+	          send(reader, REPLY, &m);
+		  reader = -1;
+	      }
+	   }
 	   break;
 	case USBGETC:
-//	   if (reader >= 0)
-//		panic("Two clients cannot wait for input at once");
+	   if (reader >= 0)
+		panic("Two clients cannot wait for input at once");
 	   reader = client;
 	   m.int1 = USBSerial_read(); //will return -1 if none available
-	   send(reader, REPLY, &m);
-	   reader = -1;
+	   if (m.int1 != -1) {
+	      send(reader, REPLY, &m);
+	      reader = -1;
+	   }
 	   break;
 	case USBPUTC:
             ch = m.int1;
@@ -223,7 +233,7 @@ void echo_task(int arg)
 (void)arg;
 
 	while (1) {
-	   timer_delay(100);
+//	   timer_delay(100); //won't be needed when USBSerial_getc() blocks
            c = USBSerial_getc();
 //	   USBSerial_putc('U');
            if (c==-1)
