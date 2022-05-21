@@ -56,6 +56,8 @@ OBJECTS = ./class/cdc/cdc_device.c.o \
 	./fromcore/Stream.cpp.o \
         glue.o
 
+all: tinyusb.a
+
 tinyusb.a: $(OBJECTS)
 	rm -f tinyusb.a
 	$(AR) cr $@ $^

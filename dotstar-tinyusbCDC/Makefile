@@ -1,4 +1,4 @@
-all: kernel.bin
+all: ../AdafruitTinyUSBObjects/Adafruit_TinyUSB_Arduino/src/tinyusb.a kernel.bin 
 
 PORT=ttyACM0
 BOSSAC=/home/nick/.arduino15/packages/adafruit/tools/bossac/1.8.0-48-gb176eee/bossac
@@ -70,7 +70,7 @@ LINK_FILE = tinyusb-trinket_m0.ld
 #	$(SIZE) $@
 %.elf: $(APP) $(WORKAROUND)
 	$(CPP) $(CPU) $(CFLAGS) -T $(VARIANT_PATH)/$(LINK_FILE) \
-		$^ -Wl,--gc-sections --specs=nano.specs --specs=nosys.specs -lstdc++ -lc -lc -o $@ -Wl,-Map,$*.map -Wl,--start-group -L/home/nick/.arduino15/packages/adafruit/tools/CMSIS/5.4.0/CMSIS/Lib/GCC/ -Wl,--end-group
+		$^ -Wl,--gc-sections --specs=nano.specs --specs=nosys.specs -lstdc++ -lc -lc -o $@ -Wl,-Map,$*.map -Wl,--start-group -L~/.arduino15/packages/adafruit/tools/CMSIS/5.4.0/CMSIS/Lib/GCC/ -Wl,--end-group
 	$(SIZE) $@
 
 disasm:
@@ -84,6 +84,9 @@ disasm:
 ../microbian/microbian.a:
 	$(MAKE) -C $(@D) all
 
+../AdafruitTinyUSBObjects/Adafruit_TinyUSB_Arduino/src/tinyusb.a:
+	$(MAKE) -C $(@D) all
+
 # Nuke the default rules for building executables
 SORRY = echo "Please say 'make $@.hex' to compile '$@'"
 %: %.s; @$(SORRY)
@@ -94,8 +97,9 @@ clean:
 	rm -f *.bin *.elf *.nm *.map *.o *elf.asm *.hexdump #2> /dev/null
 
 ultraclean: clean
-	rm -f ../microbian.a ../microbian.o
-
+	rm -f ../microbian/*.a ../microbian/*.o
+	rm -f ../AdafruitTinyUSBObjects/Adafruit_TinyUSB_Arduino/src/tinyusb.a 
+	$(MAKE) -C ../AdafruitTinyUSBObjects/Adafruit_TinyUSB_Arduino/src/ clean
 
 flash: kernel.bin
 	${BOSSAC} -i -d --port=${PORT} -i -e -w -v kernel.bin -R --offset 0x2000
